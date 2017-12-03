@@ -1,42 +1,48 @@
-#include <stdio.h>
 #include <stdlib.h>
-#include <math.h>
+#include <stdio.h>
 #include <unistd.h>
+#include <math.h>
 
-struct Key{
+typedef struct btree Btree;
+typedef struct key Key;
+struct key{
     char chave[6];
     long posicao;
 };
-struct Btree{
-    struct Btree* ponteiros;
-    struct Key *chaves;
+
+struct btree{
+    Btree* ponteiros;
+    Key *chaves;
     int QuantidadeDeChaves;
     char Filho;
 };
 
-int CalcularTamanho(int);
-struct Btree* CriarArvore(int tamanho){
-    struct Btree *arvore;
+int CalcularOrdem(double);
+
+Btree* CriarArvore(double tamanho){
     int ordem;
-    arvore = (struct Btree*)malloc(sizeof(arvore));
-    ordem = CalcularTamanho(tamanho);
+    Btree *arvore;
+    arvore = (Btree*)malloc(sizeof(arvore));
     arvore->QuantidadeDeChaves = tamanho;
-    arvore->ponteiros = (struct Btree*)calloc(ordem, (sizeof &arvore));
-    arvore->chaves = (struct Key*) calloc(ordem-1, sizeof(struct Key));
+    ordem = CalcularOrdem(tamanho);
+    arvore->ponteiros = (Btree*)calloc(ordem, (sizeof &arvore));
+    arvore->chaves = (Key*) calloc(ordem-1, sizeof(Key));
     arvore->Filho=1;
     return arvore;
 }
-int CalcularTamanho(int tamanho){
-    int m=0;
-    double N;
-    N = tamanho/2;
-    N = log(N);
-    while(4.0>(N/log(ceil(m/2)))){
+int CalcularOrdem(double tamanho){
+    double m=3.0;
+    double n,temp;
+    n = tamanho/2.0;
+    n = log(n);
+    temp=ceil(m/2.0);
+    temp=log(temp);
+    while((n/temp)>=4.0){
         m++;
+        temp=ceil(m/2);
+        temp=log(temp);
     }
-    printf("m=%d\n", m);
-    sleep(1);
-    return m;
+    return (int) m;
 }
-void AdicionarChave(struct Btree* raiz,struct Key *chave){
+void AdicionarChave(Btree* raiz, Key *chave){
 }

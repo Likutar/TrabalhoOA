@@ -1,9 +1,11 @@
 #include "Parser.h"
 
 int main (){
-    struct Btree *arvore= NULL;
+    Btree *arvore= NULL;
     FILE *DB= NULL;
-    Parse(DB, arvore);
+    double i;
+    i = log(2345);
+    parse(DB, arvore);
     printf("tamanho da arvore= %d\n", arvore->QuantidadeDeChaves);
    return 0;
 }
