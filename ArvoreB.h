@@ -25,8 +25,8 @@ Btree* CriarArvore(double tamanho){
     arvore = (Btree*)malloc(sizeof(arvore));
     ordem = CalcularOrdem(tamanho);
     arvore->ordem = ordem;
-    arvore->ponteiros = (Btree*)calloc(ordem, (sizeof &arvore));
-    arvore->chaves = (Key*) calloc(ordem-1, sizeof(Key));
+    // arvore->ponteiros = (Btree*)calloc(ordem, (sizeof &arvore));
+    // arvore->chaves = (Key*) calloc(ordem-1, sizeof(Key));
     arvore->Filho=1;
     return arvore;
 }
@@ -45,4 +45,8 @@ int CalcularOrdem(double tamanho){
     return (int) m;
 }
 void AdicionarChave(Btree* raiz, Key *chave){
+}
+
+void OrdenarNo(Btree* no){
+
 }
