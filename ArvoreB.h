@@ -37,7 +37,7 @@ int CalcularOrdem(double tamanho){
     n = log(n);
     temp=ceil(m/2.0);
     temp=log(temp);
-    while((n/temp)>=4.0){
+    while((1+n/temp)>=4.0){
         m++;
         temp=ceil(m/2);
         temp=log(temp);
