@@ -13,7 +13,7 @@ struct key{
 struct btree{
     Btree* ponteiros;
     Key *chaves;
-    int QuantidadeDeChaves;
+    int ordem;
     char Filho;
 };
 
@@ -23,8 +23,8 @@ Btree* CriarArvore(double tamanho){
     int ordem;
     Btree *arvore;
     arvore = (Btree*)malloc(sizeof(arvore));
-    arvore->QuantidadeDeChaves = tamanho;
     ordem = CalcularOrdem(tamanho);
+    arvore->ordem = ordem;
     arvore->ponteiros = (Btree*)calloc(ordem, (sizeof &arvore));
     arvore->chaves = (Key*) calloc(ordem-1, sizeof(Key));
     arvore->Filho=1;
