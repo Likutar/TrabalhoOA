@@ -1,1 +1,1 @@
-printf("tamanho da arvore= %d\n", arvore->QuantidadeDeChaves);
+printf("ok\n");
