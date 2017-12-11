@@ -150,33 +150,4 @@ void insere_registro(Btree **raiz) {
 	insere(raiz,novo);
 }
 
-int insere_simples(Btree **local, Key novo) {//simplesmente insere um novo registro em um no
-	int i;
-	for (i = 0; i<(*local)->numerodechaves; i++)
-	{
-		if ((*local)->chaves[i].chave< novo.chave)
-		{
-			break;
-		}
-	}
-	desloca_arv(local, i);
-	(*local)->chaves[i].posicao = novo.posicao;
-	strcpy((*local)->chaves[i].chave, novo.chave);
-	(*local)->numerodechaves += 1;//aumenta-se o tamanho do no
-	return i;
-}
 
-void insere(Btree **raiz, Key novo) {
-	Btree *local;
-	int i;
-	local = busca(*raiz, novo.chave);// busca local apropriado retorna local
-	if (cabe_no(local))//se cabe insere normal
-	{
-		i = insere_simples(&local, novo);
-	}
-	else {
-		i = insere_simples(&local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
-		spliting(&local);//chama a funcao de split
-	}
-
-}
