@@ -13,6 +13,7 @@ struct key{
 
 struct btree{
     Btree* filhos;
+    Btree *pai;
     Key *chaves;
     int ordem, numerodechaves, numerodoNo, numerodefilhos;
 };
@@ -158,4 +159,204 @@ void dealloc(Btree* no){
         }
     }
     free(no);
+}
+
+
+int cabe_no(Btree *raiz) {//verifica se ainda ha espaco para inserir um novo registro na pagina
+	if (raiz->numerodechaves < raiz->ordem / 2)
+		return 1;
+	else
+		return 0;
+}
+
+void spliting(Btree **raiz) {//funcao que realiza o split precisa arrumar
+	int pos, pos2, i;
+	Btree *paizao;
+	paizao = (*raiz)->pai;
+	if (paizao == NULL) {//Caso nao tenha pai
+		malocaARV(&paizao);
+		paizao->filhos[0] = raiz;
+		(*raiz)->pai = paizao;
+	}
+
+	pos = insere_simples(&paizao, (*raiz)->chaves[2]);//insere o elemento que foi promovido
+
+
+	malocaARV(&(paizao->filhos[pos + 1]));//maloca o novo no resultante do split
+	paizao->filhos[pos + 1].pai = paizao;
+
+	//realizando a divisao de registros
+	paizao->filhos[pos + 1].chaves[0].posicao = (*raiz)->chaves[3].posicao;
+	strcpy(paizao->filhos[pos + 1].chaves[0].chave, (*raiz)->chaves[3].chave);
+	paizao->filhos[pos + 1].chaves[1].posicao = (*raiz)->chaves[4].posicao;
+	strcpy(paizao->filhos[pos + 1].chaves[1].chave, (*raiz)->chaves[4].chave);
+
+	paizao->filhos[pos + 1].filhos[0] = (*raiz)->filhos[3];
+	paizao->filhos[pos + 1].filhos[1] = (*raiz)->filhos[4];
+	paizao->filhos[pos + 1].filhos[2] = (*raiz)->filhos[5];
+
+	//registros agora possuem novos tamanhos
+	paizao->filhos[pos + 1].tamanho = 2;
+	(*raiz)->tamanho = 2;
+
+	//se o pai encher, precisamos de um novo split
+	if (paizao->numerodechaves == paizao->ordem/2)
+		spliting(&paizao);
+}
+
+
+void desloca_arv(Btree **raiz, int pos) {//desloca os registros em um no para a insercao de um novo registro
+	int i;
+	for (i = (*raiz)->numerodechaves; i>pos; i--)
+	{
+		(*raiz)->filhos[i + 1] = (*raiz)->filhos[i];
+		(*raiz)->chaves[i].posicao = (*raiz)->chaves[i - 1].posicao;
+		strcpy((*raiz)->chaves[i].chave, (*raiz)->chaves[i - 1].chave);
+	}
+}
+
+int insere_simples(Btree **local, Key novo) {//simplesmente insere um novo registro em um no
+	int i;
+	for (i = 0; i<(*local)->numerodechaves; i++)
+	{
+		if ((*local)->chaves[i].chave< novo.chave)
+		{
+			break;
+		}
+	}
+	desloca_arv(local, i);
+	(*local)->chaves[i].posicao = novo.posicao;
+	strcpy((*local)->chaves[i].chave, novo.chave);
+	(*local)->numerodechaves += 1;//aumenta-se o tamanho do no
+	return i;
+}
+
+void insere(Btree **raiz, Key novo) {
+	Btree *local;
+	int i;
+	local = busca(*raiz, novo.chave);// busca local apropriado retorna local
+	if (cabe_no(local))//se cabe insere normal
+	{
+		i = insere_simples(&local, novo);
+	}
+	else {
+		i = insere_simples(&local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
+		spliting(&local);//chama a funcao de split
+	}
+
+}
+void insere_registro(Btree **raiz) {
+	struct key novo;
+	int k;
+	char policyID[6];
+	char statecode[2];
+	char county[15];
+	char eq_site_limit[15];
+	char hu_site_limit[15];
+	char fl_site_limit[15];
+	char fr_site_limit[15];
+	char tiv_2011[15];
+	char tiv_2012[15];
+	char eq_site_deductible[15];
+	char hu_site_deductible[15];
+	char fl_site_deductible[15];
+	char fr_site_deductible[15];
+	char point_latitude[15];
+	char point_longitude[15];
+	char line[15];
+	char construction[15];
+	char point_granularity[15];
+
+	printf("Digite o policyID");
+	scanf("%s", policyID);
+	getchar();
+	printf("Digite o statecode");
+	scanf("%s", statecode);
+	getchar();
+	printf("Digite o county");
+	scanf("%s", county);
+	getchar();
+	printf("Digite o eq_site_limit");
+	scanf("%s", eq_site_limit);
+	getchar();
+	printf("Digite o hu_site_limit");
+	scanf("%s", hu_site_limit);
+	getchar();
+	printf("Digite o fl_site_limit");
+	scanf("%s", fl_site_limit);
+	getchar();
+	printf("Digite o fr_site_limit");
+	scanf("%s", fr_site_limit);
+	getchar();
+	printf("Digite o tiv_2011");
+	scanf("%s", tiv_2011);
+	getchar();
+	printf("Digite o tiv_2012");
+	scanf("%s", tiv_2012);
+	printf("Digite o eq_site_deductible");
+	scanf("%s", eq_site_deductible);
+	getchar();
+	printf("Digite o hu_site_deductible");
+	scanf("%s", hu_site_deductible);
+	getchar();
+	printf("Digite o fl_site_deductible");
+	scanf("%s", fl_site_deductible);
+	getchar();
+	printf("Digite o fr_site_deductible");
+	scanf("%s", fr_site_deductible);
+	getchar();
+	printf("Digite o point_latitude");
+	scanf("%s", point_latitude);
+	getchar();
+	printf("Digite o point_longitude");
+	scanf("%s", point_longitude);
+	getchar();
+	printf("Digite o line");
+	scanf("%s", line);
+	getchar();
+	printf("Digite o construction");
+	scanf("%s", construction);
+	getchar();
+	printf("Digite o point_granularity");
+	scanf("%s", point_granularity);
+	getchar();
+
+	FILE *p;
+	p = fopen("FL_insurance_sample.csv", "a+");
+	if (p == NULL) {
+		printf("Nao conseguiu abrir!\n");
+	}
+	do {
+		c = getc(p);
+		if (c == '\n') {
+			k++;
+		}
+	} while (c != EOF);
+
+	fprintf(p, "%s,", policyID);
+	fprintf(p, "%s,", statecode);
+	fprintf(p, "%s,", county);
+	fprintf(p, "%s,", eq_site_limit);
+	fprintf(p, "%s,", hu_site_limit);
+	fprintf(p, "%s,", fl_site_limit);
+	fprintf(p, "%s,", fr_site_limit);
+	fprintf(p, "%s,", tiv_2011);
+	fprintf(p, "%s,", tiv_2012);
+	fprintf(p, "%s,", eq_site_deductible);
+	fprintf(p, "%s,", hu_site_deductible);
+	fprintf(p, "%s,", fl_site_deductible);
+	fprintf(p, "%s,", fr_site_deductible);
+	fprintf(p, "%s,", point_latitude);
+	fprintf(p, "%s,", point_longitude);
+	fprintf(p, "%s,", line);
+	fprintf(p, "%s,", construction);
+	fprintf(p, "%s\n", point_granularity);
+
+	fclose(p);
+	// inserir na arvore
+	novo.posicao = k;
+    strcpy(novo.chave, policyID);
+	insere(raiz,novo);
+
+
 }
