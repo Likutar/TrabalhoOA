@@ -7,7 +7,7 @@
 typedef struct btree Btree;
 typedef struct key Key;
 struct key{
-    char chave[6];
+    char chave[7];
     long posicao;
 };
 
@@ -31,6 +31,7 @@ Btree* CriarArvore(int tamanho){
     arvore->numerodoNo=0;
     return arvore;
 }
+
 int CalcularOrdem(double tamanho){
     double m=3.0;
     double n,temp;
@@ -44,13 +45,6 @@ int CalcularOrdem(double tamanho){
         temp=log(temp);
     }
     return (int) m;
-}
-void AdicionarChave(Btree* raiz, Key *chave){
-    Key *chaves;
-
-}
-
-void OrdenarNo(Btree* no){
 }
 
 
@@ -90,6 +84,7 @@ void Heapsort(Key* chaves, int numerodechaves){//Ordena as chaves secundarias da
     }
 
 }
+
 void GravarArvore(Btree* atual, FILE *arquivo){
     int i;
     fwrite(&atual->numerodoNo,sizeof(int),1,arquivo);
@@ -102,6 +97,7 @@ void GravarArvore(Btree* atual, FILE *arquivo){
         }
     }
 }
+
 void PreGravar(Btree* raiz){
     FILE* arquivo;
     arquivo=fopen("indicelista.bt","wb");
@@ -110,6 +106,7 @@ void PreGravar(Btree* raiz){
     fclose(arquivo);
     
 }
+
 void LerArvore(Btree* atual, FILE *arquivo, int ordem){
     int i;
     atual->ordem=ordem;
@@ -125,12 +122,17 @@ void LerArvore(Btree* atual, FILE *arquivo, int ordem){
         }
     }
 }
-void PreLer(Btree* raiz){
+
+int PreLer(Btree* raiz){
     FILE* arquivo;
     arquivo=fopen("indicelista.bt","rb");
+    if (arquivo == NULL){
+        return 0;
+    }
     raiz = malloc(sizeof(Btree));
     fread(&raiz->ordem,sizeof(int),1,arquivo);
     LerArvore(raiz,arquivo, raiz->ordem);
+    return 1;
 }
 
 long Busca(Btree* no, char* chave){
@@ -163,7 +165,14 @@ void dealloc(Btree* no){
 
 
 int cabe_no(Btree *raiz) {//verifica se ainda ha espaco para inserir um novo registro na pagina
-	if (raiz->numerodechaves < raiz->ordem / 2)
+	if (raiz->numerodechaves < raiz->ordem) 
+		return 1;
+	else
+		return 0;
+}
+
+int lotacao_min(Btree* no){//verifica se o no esta com a lotação minima antes de ser necessaria uma redistribuição/concatenação
+    	if (no->numerodechaves < no->ordem /2) 
 		return 1;
 	else
 		return 0;

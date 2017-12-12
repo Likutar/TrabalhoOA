@@ -5,7 +5,25 @@ Btree* parse(FILE*);
 int main (){
     Btree *arvore= NULL;
     FILE *DB= NULL;
-    arvore = parse(DB);
+    char loop=1;
+    int sel;
+    if(PreLer(arvore)==0){
+        arvore = parse(DB);
+    }
+    while (loop = 1){
+        printf("\033[2J\033[1;1H");
+        printf("Qual operação deseja realizar\n1) Buscar\n2) adicionar\n3)excluir\n4)alterar\n5)sair");
+        scanf("%d", sel);
+        switch(sel){
+            case 1:
+                escolher_busca(arvore);
+            case 2:
+            case 3:
+            case 4:
+            default:
+                sel =0;
+        }
+    }
     printf("tamanho da arvore= %d\n", arvore->ordem);
     dealloc(arvore);
    return 0;
@@ -29,12 +47,71 @@ Btree* parse(FILE *DB){
         for(i=0;i<6;i++){
             chaveprim.chave[i]=str[i];
         }
+        chaveprim.chave[6]='\n';
         chaveprim.posicao = (long)ftell;
+        insere(arvore, chaveprim);
     }
     printf("chaveprimaria= %s\n", chaveprim.chave);
     return arvore;
 }
-
+void strload(char* str, char *temp, int *i){
+    int posicao=0;
+    memset(temp, ' ', 15);
+    while(str[*i]!=','){
+        temp[posicao]=str[*i];
+        *i++;
+    }
+    *i++;
+}
+void escolher_busca(Btree *arvore){
+    char chave[7], str[150], temp[15];
+    long posicao;
+    int i=0;
+    FILE *DB;
+    printf("\033[2J\033[1;1H");
+    printf("Qual a chave do registro que deseja achar?\n");
+    scanf("%s", chave);
+    posicao = Busca(arvore, chave);
+    DB = fopen("data.txt", "r");
+    fseek(DB,posicao , 0);
+    fgets(str,150, DB);
+    strload(str,temp,i);
+    printf("policyID: %s\n", temp);
+    strload(str,temp,i);
+    printf("Statecode:%s\n", temp);
+    strload(str,temp,i);
+    printf("County: %s\n", temp);
+    strload(str,temp,i);
+	printf("eq_site_limit: %s\n", temp);
+	strload(str,temp,i);
+	printf("hu_site_limit: %s\n", temp);
+	strload(str,temp,i);
+	printf("fl_site_limit: %s\n", temp);
+	strload(str,temp,i);
+	printf("fr_site_limit: %s\n");
+	strload(str,temp,i);
+	printf("tiv_2011: %s\n", temp);
+	strload(str,temp,i);
+	printf("tiv_2012: %s\n", temp);
+	strload(str,temp,i);
+	printf("eq_site_deductible: %s\n", temp);
+	strload(str,temp,i);
+	printf("hu_site_deductible: %s\n", temp);
+	strload(str,temp,i);
+    printf("fl_site_deductible: %s\n", temp);
+    strload(str,temp,i);
+	printf("fr_site_deductible: %s\n", temp);
+    strload(str,temp,i);
+	printf("point_latitude: %s\n", temp);
+	strload(str,temp,i);
+	printf("point_longitude: %s\n", temp);
+	strload(str,temp,i);
+	printf("line: %s\n", temp);
+	strload(str,temp,i);
+	printf("construction: %s\n");
+	strload(str,temp,i);
+	printf("point_granularity: %s\n");
+}
 
 void insere_registro(Btree **raiz) {
 	struct key novo;
