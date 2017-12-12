@@ -82,6 +82,7 @@ void escolher_busca(Btree *arvore){
             fseek(DB,posicao , 0);
             fgets(str,150, DB);
             strload(str,temp,i);
+            printf("\033[2J\033[1;1H");
             printf("policyID: %s\n", temp);
             strload(str,temp,i);
             printf("Statecode:%s\n", temp);
@@ -117,8 +118,11 @@ void escolher_busca(Btree *arvore){
             printf("construction: %s\n");
             strload(str,temp,i);
             printf("point_granularity: %s\n");
+            printf("deseja procurar outro?[s/n]\n");
+            scanf("%c",sel);
         }
         else{
+            printf("\033[2J\033[1;1H");
             printf("registro nao encontrado, deseja procurar outro?[s/n]\n");
             scanf("%c",sel);
         }
@@ -128,23 +132,10 @@ void escolher_busca(Btree *arvore){
 void insere_registro(Btree **raiz) {
 	struct key novo;
 	int k;
-	char policyID[6];
-	char statecode[2];
-	char county[15];
-	char eq_site_limit[15];
-	char hu_site_limit[15];
-	char fl_site_limit[15];
-	char fr_site_limit[15];
-	char tiv_2011[15];
-	char tiv_2012[15];
-	char eq_site_deductible[15];
-	char hu_site_deductible[15];
-	char fl_site_deductible[15];
-	char fr_site_deductible[15];
-	char point_latitude[15];
-	char point_longitude[15];
-	char line[15];
-	char construction[15];
+	char policyID[6], statecode[2], county[15], eq_site_limit[15], hu_site_limit[15];
+	char fl_site_limit[15], fr_site_limit[15], tiv_2011[15], tiv_2012[15];
+	char eq_site_deductible[15], hu_site_deductible[15], fl_site_deductible[15], fr_site_deductible[15];
+	char point_latitude[15], point_longitude[15], line[15], construction[15];
 	char point_granularity[15];
 
 	printf("Digite o policyID");
