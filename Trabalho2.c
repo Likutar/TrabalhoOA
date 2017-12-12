@@ -17,7 +17,10 @@ int main (){
         switch(sel){
             case 1:
                 escolher_busca(arvore);
+                break;
             case 2:
+                insere_registro(arvore);
+                break;
             case 3:
             case 4:
             default:
@@ -64,53 +67,62 @@ void strload(char* str, char *temp, int *i){
     *i++;
 }
 void escolher_busca(Btree *arvore){
-    char chave[7], str[150], temp[15];
+    char chave[7], str[150], temp[15], sel;
     long posicao;
     int i=0;
     FILE *DB;
-    printf("\033[2J\033[1;1H");
-    printf("Qual a chave do registro que deseja achar?\n");
-    scanf("%s", chave);
-    posicao = Busca(arvore, chave);
-    DB = fopen("data.txt", "r");
-    fseek(DB,posicao , 0);
-    fgets(str,150, DB);
-    strload(str,temp,i);
-    printf("policyID: %s\n", temp);
-    strload(str,temp,i);
-    printf("Statecode:%s\n", temp);
-    strload(str,temp,i);
-    printf("County: %s\n", temp);
-    strload(str,temp,i);
-	printf("eq_site_limit: %s\n", temp);
-	strload(str,temp,i);
-	printf("hu_site_limit: %s\n", temp);
-	strload(str,temp,i);
-	printf("fl_site_limit: %s\n", temp);
-	strload(str,temp,i);
-	printf("fr_site_limit: %s\n");
-	strload(str,temp,i);
-	printf("tiv_2011: %s\n", temp);
-	strload(str,temp,i);
-	printf("tiv_2012: %s\n", temp);
-	strload(str,temp,i);
-	printf("eq_site_deductible: %s\n", temp);
-	strload(str,temp,i);
-	printf("hu_site_deductible: %s\n", temp);
-	strload(str,temp,i);
-    printf("fl_site_deductible: %s\n", temp);
-    strload(str,temp,i);
-	printf("fr_site_deductible: %s\n", temp);
-    strload(str,temp,i);
-	printf("point_latitude: %s\n", temp);
-	strload(str,temp,i);
-	printf("point_longitude: %s\n", temp);
-	strload(str,temp,i);
-	printf("line: %s\n", temp);
-	strload(str,temp,i);
-	printf("construction: %s\n");
-	strload(str,temp,i);
-	printf("point_granularity: %s\n");
+    sel ='s';
+    while(sel = 's'){
+        printf("\033[2J\033[1;1H");
+        printf("Qual a chave do registro que deseja achar?\n");
+        scanf("%s", chave);
+        posicao = Busca(arvore, chave);
+        if(posicao != -1.0){
+            DB = fopen("data.txt", "r");
+            fseek(DB,posicao , 0);
+            fgets(str,150, DB);
+            strload(str,temp,i);
+            printf("policyID: %s\n", temp);
+            strload(str,temp,i);
+            printf("Statecode:%s\n", temp);
+            strload(str,temp,i);
+            printf("County: %s\n", temp);
+            strload(str,temp,i);
+            printf("eq_site_limit: %s\n", temp);
+            strload(str,temp,i);
+            printf("hu_site_limit: %s\n", temp);
+            strload(str,temp,i);
+            printf("fl_site_limit: %s\n", temp);
+            strload(str,temp,i);
+            printf("fr_site_limit: %s\n");
+            strload(str,temp,i);
+            printf("tiv_2011: %s\n", temp);
+            strload(str,temp,i);
+            printf("tiv_2012: %s\n", temp);
+            strload(str,temp,i);
+            printf("eq_site_deductible: %s\n", temp);
+            strload(str,temp,i);
+            printf("hu_site_deductible: %s\n", temp);
+            strload(str,temp,i);
+            printf("fl_site_deductible: %s\n", temp);
+            strload(str,temp,i);
+            printf("fr_site_deductible: %s\n", temp);
+            strload(str,temp,i);
+            printf("point_latitude: %s\n", temp);
+            strload(str,temp,i);
+            printf("point_longitude: %s\n", temp);
+            strload(str,temp,i);
+            printf("line: %s\n", temp);
+            strload(str,temp,i);
+            printf("construction: %s\n");
+            strload(str,temp,i);
+            printf("point_granularity: %s\n");
+        }
+        else{
+            printf("registro nao encontrado, deseja procurar outro?[s/n]\n");
+            scanf("%c",sel);
+        }
+    }
 }
 
 void insere_registro(Btree **raiz) {
