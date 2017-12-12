@@ -47,44 +47,6 @@ int CalcularOrdem(double tamanho){
     return (int) m;
 }
 
-
-void MontarHeap(Key* heap,int pos){//Metodo que efetivamente faz a montagem da heap para o heapsort
-    int pai;
-    Key temp;
-    pai= (pos-1)/2;
-    if(heap[pos].chave<heap[pai].chave&& pos!=0){
-        temp=heap[pai];
-        heap[pai]=heap[pos];
-        heap[pos]=temp;
-        if(pos!=0) MontarHeap(heap, pai);
-    }
-}
-
-void Heapsort(Key* chaves, int numerodechaves){//Ordena as chaves secundarias da menor para a maior
-    int i,a, heapsize;
-    Key *heap, *temp;
-    heap = calloc(numerodechaves, sizeof(Key));
-    i=0;
-    heap = chaves;
-    heapsize = numerodechaves;
-    i=0;
-    MontarHeap(heap, heapsize-1);
-    while(heapsize!=0){
-        chaves[i]=heap[0];
-        a=0;
-        temp = calloc(heapsize-1,sizeof(Key));
-        while(a<heapsize-1){
-            temp[a]=heap[a+1];
-            MontarHeap(temp,a);
-            a++;
-        }
-        i++;
-        heap=temp;
-        heapsize--;
-    }
-
-}
-
 void GravarArvore(Btree* atual, FILE *arquivo){
     int i;
     fwrite(&atual->numerodoNo,sizeof(int),1,arquivo);
@@ -153,6 +115,26 @@ long Busca(Btree* no, char* chave){
     }
     return -1.0;
 }
+
+Btree* Busca(Btree* no, char* chave){
+    int i,a;
+    i=0;
+    a=strcmp(chave, no->chaves[i].chave);
+    while(a>=0 && i< no->numerodechaves){
+        if(a==0){
+            return no;
+        }
+        i++;
+        if(i != no->numerodechaves){
+            a=strcmp(chave, no->chaves[i].chave);
+        }
+    }
+    if(a<0 || i == no->numerodechaves){
+        return Busca(&no->filhos[i],chave);
+    }
+    return NULL;
+}
+
 void dealloc(Btree* no){
     int i;
     if(no->numerodefilhos>0){
