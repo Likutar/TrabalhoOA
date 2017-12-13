@@ -7,8 +7,9 @@
 typedef struct btree Btree;
 typedef struct key Key;
 struct key{
-    char chave[7];
+    char *chave;
     long posicao;
+
 };
 
 struct btree{
@@ -116,12 +117,13 @@ int PreLer(Btree* raiz, char* nome){
 //     return -1.0;
 // }
 
-Btree* BuscaNo(Btree* no, char* chave){
+Btree* BuscaNo(Btree* no, char* chave, int *local){
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);
     while(a>=0 && i< no->numerodechaves){
         if(a==0){
+            local =i;
             return no;
         }
         i++;
@@ -206,26 +208,25 @@ void desloca_arv(Btree **raiz, int pos) {//desloca os registros em um no para a 
 	}
 }
 
-int insere_simples(Btree **local, Key novo) {//simplesmente insere um novo registro em um no
+int insere_simples(Btree *local, Key *novo) {//simplesmente insere um novo registro em um no
 	int i;
-	for (i = 0; i<(*local)->numerodechaves; i++)
+	for (i = 0; i<local->numerodechaves; i++)
 	{
-		if ((*local)->chaves[i].chave< novo.chave)
+		if (local->chaves[i].chave< novo->chave)
 		{
 			break;
 		}
 	}
 	desloca_arv(local, i);
-	(*local)->chaves[i].posicao = novo.posicao;
-	strcpy((*local)->chaves[i].chave, novo.chave);
-	(*local)->numerodechaves += 1;//aumenta-se o tamanho do no
+	local->chaves[i].posicao = novo->posicao;
+    local->chaves[i].chave = novo->chave;
+	local->numerodechaves += 1;//aumenta-se o tamanho do no
 	return i;
 }
-
-void insere(Btree **raiz, Key novo) {
+void insere(Btree *raiz, Key *novo) {
 	Btree *local;
 	int i;
-	local = busca(*raiz, novo.chave);// busca local apropriado retorna local
+	local = busca(raiz, novo->chave);// busca local apropriado retorna local
 	if (cabe_no(local))//se cabe insere normal
 	{
 		i = insere_simples(&local, novo);
@@ -234,5 +235,4 @@ void insere(Btree **raiz, Key novo) {
 		i = insere_simples(&local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
 		spliting(&local);//chama a funcao de split
 	}
-
 }

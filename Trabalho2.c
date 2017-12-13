@@ -24,11 +24,13 @@ int main (){
         }
         strcat(nomeindice, "_indicelista.bt");
         if(PreLer(arvore, nomeindice)==0){
+            DB = fopen(nome,"r");
             arvore = parse(DB);
         }
     }
     else{
         if(PreLer(arvore, "indicelista.bt")==0){
+            DB = fopen("data.txt","r");
             arvore = parse(DB);
         }
     }
@@ -55,26 +57,33 @@ int main (){
 }
 
 Btree* parse(FILE *DB){
-    char str[150];
+    char str[200];
     Btree *arvore= NULL;
     int i, tamanho;
     Key chaveprim;
-    DB = fopen("data.txt","r");
     fseek(DB,0, 0);
     tamanho=0;
-     while(fgets(str,150, DB)!=NULL){
+     while(fgets(str,200, DB)!=NULL){
          tamanho++;
      }
     fseek(DB,0,0);
     arvore=CriarArvore(tamanho);
     
-    while(fgets(str,150, DB)!=NULL){
-        for(i=0;i<6;i++){
-            chaveprim.chave[i]=str[i];
+    while(fgets(str,200, DB)!=NULL){
+        i=0;
+        while(str[i]!=',' && str[i]!= '\n'){
+            i++;
         }
-        chaveprim.chave[6]='\n';
+        if(str[i]!= ','){
+            printf("ERRO: arquivo no formato errado, ou chave primaria muito grande\n");
+            return NULL;
+        }
+        tamanho =i+1;
+        chaveprim.chave = malloc(sizeof(char)* tamanho);
+        strncmp(chaveprim.chave,str, i);
+        chaveprim.chave[tamanho]='\n';
         chaveprim.posicao = (long)ftell;
-        insere(arvore, chaveprim);
+        insere(arvore, &chaveprim);
     }
     printf("chaveprimaria= %s\n", chaveprim.chave);
     return arvore;
@@ -152,7 +161,7 @@ void escolher_busca(Btree *arvore){
 }
 
 void insere_registro(Btree **raiz) {
-	struct key novo;
+	Key novo;
 	int k;
 	char policyID[6], statecode[2], county[15], eq_site_limit[15], hu_site_limit[15];
 	char fl_site_limit[15], fr_site_limit[15], tiv_2011[15], tiv_2012[15];
@@ -249,7 +258,7 @@ void insere_registro(Btree **raiz) {
 	// inserir na arvore
 	novo.posicao = k;
     strcpy(novo.chave, policyID);
-	insere(raiz,novo);
+	insere(raiz,&novo);
 }
 
 
