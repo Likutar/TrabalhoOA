@@ -97,31 +97,32 @@ int PreLer(Btree* raiz){
     return 1;
 }
 
-long Busca(Btree* no, char* chave){
-    int i,a;
-    i=0;
-    a=strcmp(chave, no->chaves[i].chave);
-    while(a>=0 && i< no->numerodechaves){
-        if(a==0){
-            return no->chaves[i].posicao;
-        }
-        i++;
-        if(i != no->numerodechaves){
-            a=strcmp(chave, no->chaves[i].chave);
-        }
-    }
-    if(a<0 || i == no->numerodechaves){
-        return Busca(&no->filhos[i],chave);
-    }
-    return -1.0;
-}
+// long Busca(Btree* no, char* chave){
+//     int i,a;
+//     i=0;
+//     a=strcmp(chave, no->chaves[i].chave);
+//     while(a>=0 && i< no->numerodechaves){
+//         if(a==0){
+//             return no->chaves[i].posicao;
+//         }
+//         i++;
+//         if(i != no->numerodechaves){
+//             a=strcmp(chave, no->chaves[i].chave);
+//         }
+//     }
+//     if(a<0 || i == no->numerodechaves){
+//         return Busca(&no->filhos[i],chave);
+//     }
+//     return -1.0;
+// }
 
-Btree* Busca(Btree* no, char* chave){
+Btree* Busca(Btree* no, char* chave, int *local){
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);
     while(a>=0 && i< no->numerodechaves){
         if(a==0){
+		local = i;
             return no;
         }
         i++;
