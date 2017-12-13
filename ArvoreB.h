@@ -85,9 +85,9 @@ void LerArvore(Btree* atual, FILE *arquivo, int ordem){
     }
 }
 
-int PreLer(Btree* raiz){
+int PreLer(Btree* raiz, char* nome){
     FILE* arquivo;
-    arquivo=fopen("indicelista.bt","rb");
+    arquivo=fopen(nome,"rb");
     if (arquivo == NULL){
         return 0;
     }
@@ -97,26 +97,26 @@ int PreLer(Btree* raiz){
     return 1;
 }
 
-long Busca(Btree* no, char* chave){
-    int i,a;
-    i=0;
-    a=strcmp(chave, no->chaves[i].chave);
-    while(a>=0 && i< no->numerodechaves){
-        if(a==0){
-            return no->chaves[i].posicao;
-        }
-        i++;
-        if(i != no->numerodechaves){
-            a=strcmp(chave, no->chaves[i].chave);
-        }
-    }
-    if(a<0 || i == no->numerodechaves){
-        return Busca(&no->filhos[i],chave);
-    }
-    return -1.0;
-}
+// long Busca(Btree* no, char* chave){
+//     int i,a;
+//     i=0;
+//     a=strcmp(chave, no->chaves[i].chave);
+//     while(a>=0 && i< no->numerodechaves){
+//         if(a==0){
+//             return no->chaves[i].posicao;
+//         }
+//         i++;
+//         if(i != no->numerodechaves){
+//             a=strcmp(chave, no->chaves[i].chave);
+//         }
+//     }
+//     if(a<0 || i == no->numerodechaves){
+//         return Busca(&no->filhos[i],chave);
+//     }
+//     return -1.0;
+// }
 
-Btree* Busca(Btree* no, char* chave){
+Btree* BuscaNo(Btree* no, char* chave){
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);

@@ -6,9 +6,31 @@ int main (){
     Btree *arvore= NULL;
     FILE *DB= NULL;
     char loop=1;
+    char nome[30];
+    char *nomeindice;
     int sel;
-    if(PreLer(arvore)==0){
-        arvore = parse(DB);
+    printf("\033[2J\033[1;1H");
+    printf("Qual arquivo deseja abrir?\n");
+    printf("1) data.txt\n2) outro\n");
+    scanf("%d", sel);
+    if (sel== 2){
+        printf("Qual o nome do arquivo?\n");
+        scanf("%s",nome);
+        nomeindice = malloc(sizeof(char)*(strlen(nome)+12));
+        sel=0;
+        while(nome[sel]!='.'){
+            nomeindice[sel]= nome[sel];
+            sel++;
+        }
+        strcat(nomeindice, "_indicelista.bt");
+        if(PreLer(arvore, nomeindice)==0){
+            arvore = parse(DB);
+        }
+    }
+    else{
+        if(PreLer(arvore, "indicelista.bt")==0){
+            arvore = parse(DB);
+        }
     }
     while (loop = 1){
         printf("\033[2J\033[1;1H");
