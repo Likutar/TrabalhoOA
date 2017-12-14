@@ -46,6 +46,8 @@ int main (){
                 insere_registro(arvore);
                 break;
             case 3:
+                exclui(arvore, DB);
+                break;
             case 4:
             default:
                 sel =0;
@@ -225,15 +227,15 @@ void insere_registro(Btree **raiz) {
 
 	FILE *p;
 	p = fopen("FL_insurance_sample.csv", "a+");
-	if (p == NULL) {
-		printf("Nao conseguiu abrir!\n");
-	}
-	do {
-		c = getc(p);
-		if (c == '\n') {
-			k++;
-		}
-	} while (c != EOF);
+	// if (p == NULL) {
+	// 	printf("Nao conseguiu abrir!\n");
+	// }
+	// do {
+	// 	c = getc(p);
+	// 	if (c == '\n') {
+	// 		k++;
+	// 	}
+	// } while (c != EOF);
 
 	fprintf(p, "%s,", policyID);
 	fprintf(p, "%s,", statecode);

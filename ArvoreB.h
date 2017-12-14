@@ -175,44 +175,44 @@ int lotacao_min(Btree* no){//verifica se o no esta com a lotação minima antes 
 		return 0;
 }
 
-void spliting(Btree **raiz) {//funcao que realiza o split precisa arrumar
+void spliting(Btree *raiz) {//funcao que realiza o split precisa arrumar
 	int pos, pos2, i, counter, j, state;
 	Btree *paizao;
-	paizao = (*raiz)->pai;
+	paizao = raiz->pai;
 	if (paizao == NULL) {//Caso nao tenha pai
-		malocaARV(&paizao);
-		paizao->filhos[0] = **raiz;
-		(*raiz)->pai = paizao;
+		malocaARV(paizao);
+		paizao->filhos[0] = *raiz;
+		raiz->pai = paizao;
 	}
-	pos = insere_simples(&paizao, (*raiz)->chaves[((*raiz)->ordem)/2]);//insere o elemento que foi promovido
+	pos = insere_simples(paizao, &raiz->chaves[(raiz->ordem)/2]);//insere o elemento que foi promovido
 	malocaARV(&(paizao->filhos[pos + 1]));//maloca o novo no resultante do split
 	paizao->filhos[pos + 1].pai = paizao;
 	//realizando a divisao de registros
     counter = 0;
-    for(j=(int)((*raiz)->ordem)/2+1;j< ((*raiz)->ordem);j++){
-	   paizao->filhos[pos + 1].chaves[counter].posicao = (*raiz)->chaves[j].posicao;
-	   strcpy(paizao->filhos[pos + 1].chaves[counter].chave, (*raiz)->chaves[j].chave);
+    for(j=(int)(raiz->ordem)/2+1;j< (raiz->ordem);j++){
+	   paizao->filhos[pos + 1].chaves[counter].posicao = raiz->chaves[j].posicao;
+	   strcpy(paizao->filhos[pos + 1].chaves[counter].chave, raiz->chaves[j].chave);
        counter++;
 
     }
 
 	//registros agora possuem novos tamanhos
-	paizao->filhos[pos + 1].numerodechaves = (((*raiz)->ordem) % 2 == 0? ((*raiz)->ordem)/2-1 : ((*raiz)->ordem)/2);
-	(*raiz)->numerodechaves = (int)(((*raiz)->ordem)/2);
+	paizao->filhos[pos + 1].numerodechaves = ((raiz->ordem) % 2 == 0? (raiz->ordem)/2-1 : (raiz->ordem)/2);
+	raiz->numerodechaves = (int)((raiz->ordem)/2);
 
 	//se o pai encher, precisamos de um novo split
 	if (paizao->numerodechaves == paizao->ordem/2)
-		spliting(&paizao);
+		spliting(paizao);
 }
 
 
-void desloca_arv(Btree **raiz, int pos) {//desloca os registros em um no para a insercao de um novo registro
+void desloca_arv(Btree *raiz, int pos) {//desloca os registros em um no para a insercao de um novo registro
 	int i;
-	for (i = (*raiz)->numerodechaves; i>pos; i--)
+	for (i = raiz->numerodechaves; i>pos; i--)
 	{
-		(*raiz)->filhos[i + 1] = (*raiz)->filhos[i];
-		(*raiz)->chaves[i].posicao = (*raiz)->chaves[i - 1].posicao;
-		strcpy((*raiz)->chaves[i].chave, (*raiz)->chaves[i - 1].chave);
+		raiz->filhos[i + 1] = raiz->filhos[i];
+		raiz->chaves[i].posicao = raiz->chaves[i - 1].posicao;
+		strcpy(raiz->chaves[i].chave, raiz->chaves[i - 1].chave);
 	}
 }
 
@@ -262,15 +262,11 @@ void concat(Btree *folha, Btree *irmao, int lado){
 
 }
 void redistribuicao(Btree *folha, Btree *irmao, int eu, int irma){//aplica a redistribuicao, i(1 d, -1 e) � o numero da folha do pai dela
-
     Key *pai, *substituto;
     int i;
-
     if(irma == -1){// para a irma sendo da esquerda
         pai = &folha->pai->chaves[eu - 1];
         substituto = &irmao->chaves[irmao->numerodechaves - 1];
-
-
         for(i=0 ; i < folha->numerodechaves ; i++ ){//abre espa�o para o pai q vai entrar
             folha->chaves[i+1] = folha->chaves[i];
         }
@@ -421,14 +417,15 @@ void exclui_tree(Btree *deletado, int posicao){
 }
 
 
-void exclui() {
+void exclui(Btree* raiz, FILE* DB) {
     char *nome_do_arquivo;
 	long nreg;
 	int posicao;
 	Btree *deletado;
 	char *chave;
+    printf("\033[2J\033[1;1H");
 	printf("insira a chave do registro o qual deseja excluir: ");
-	scanf("%c", &chave);
+	scanf("%s", &chave);
 	getchar();
     //deletado = busca(*raiz ,chave, posicao);
     if(deletado != NULL){
