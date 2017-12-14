@@ -130,13 +130,21 @@ int PreLer(Btree* raiz, char* nomeindice){
 //     return -1.0;
 // }
 
+<<<<<<< HEAD
 Btree* BuscaNo(Btree* no, char* chave, int *local){
+=======
+Btree* Busca(Btree* no, char* chave, int *local){
+>>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);
     while(a>=0 && i< no->numerodechaves){
         if(a==0){
+<<<<<<< HEAD
             local =i;
+=======
+		local = i;
+>>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
             return no;
         }
         i++;
@@ -248,4 +256,9 @@ void insere(Btree *raiz, Key *novo) {
 		i = insere_simples(&local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
 		spliting(&local);//chama a funcao de split
 	}
+<<<<<<< HEAD
 }
+=======
+
+}
+>>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
