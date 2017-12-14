@@ -2,6 +2,8 @@
 
 Btree* parse(FILE*);
 
+void escolher_busca(Btree*);
+void insere_registro(Btree*);
 int main (){
     Btree *arvore= NULL;
     FILE *DB= NULL;
@@ -12,7 +14,7 @@ int main (){
     printf("\033[2J\033[1;1H");
     printf("Qual arquivo deseja abrir?\n");
     printf("1) data.txt\n2) outro\n");
-    scanf("%d", sel);
+    scanf("%d", &sel);
     if (sel== 2){
         printf("Qual o nome do arquivo?\n");
         scanf("%s",nome);
@@ -34,10 +36,11 @@ int main (){
             arvore = parse(DB);
         }
     }
-    while (loop = 1){
+    while (loop == 1){
         printf("\033[2J\033[1;1H");
         printf("Qual operação deseja realizar\n1) Buscar\n2) adicionar\n3)excluir\n4)alterar\n5)sair");
-        scanf("%d", sel);
+        scanf("%d", &sel);
+        
         switch(sel){
             case 1:
                 escolher_busca(arvore);
@@ -50,7 +53,7 @@ int main (){
                 break;
             case 4:
             default:
-                sel =0;
+                loop = 0;
         }
     }
     printf("tamanho da arvore= %d\n", arvore->ordem);
@@ -82,12 +85,13 @@ Btree* parse(FILE *DB){
         }
         tamanho =i+1;
         chaveprim.chave = malloc(sizeof(char)* tamanho);
-        strncmp(chaveprim.chave,str, i);
-        chaveprim.chave[tamanho]='\n';
+        strncpy(chaveprim.chave,str, i);
+        chaveprim.chave[i]='\0';
         chaveprim.posicao = (long)ftell;
+        // printf("chave =%s \n", chaveprim.chave);
         insere(arvore, &chaveprim);
+
     }
-    printf("chaveprimaria= %s\n", chaveprim.chave);
     return arvore;
 }
 void strload(char* str, char *temp, int *i){
@@ -105,7 +109,7 @@ void escolher_busca(Btree *arvore){
     int i=0;
     FILE *DB;
     sel ='s';
-    while(sel = 's'){
+    while(sel =='s'){
         printf("\033[2J\033[1;1H");
         printf("Qual a chave do registro que deseja achar?\n");
         scanf("%s", chave);
@@ -114,57 +118,57 @@ void escolher_busca(Btree *arvore){
             DB = fopen("data.txt", "r");
             fseek(DB,posicao , 0);
             fgets(str,150, DB);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("\033[2J\033[1;1H");
             printf("policyID: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("Statecode:%s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("County: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("eq_site_limit: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("hu_site_limit: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("fl_site_limit: %s\n", temp);
-            strload(str,temp,i);
-            printf("fr_site_limit: %s\n");
-            strload(str,temp,i);
+            strload(str, temp, &i);
+            printf("fr_site_limit: %s\n", temp);
+            strload(str, temp, &i);
             printf("tiv_2011: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("tiv_2012: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("eq_site_deductible: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("hu_site_deductible: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("fl_site_deductible: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("fr_site_deductible: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("point_latitude: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("point_longitude: %s\n", temp);
-            strload(str,temp,i);
+            strload(str, temp, &i);
             printf("line: %s\n", temp);
-            strload(str,temp,i);
-            printf("construction: %s\n");
-            strload(str,temp,i);
-            printf("point_granularity: %s\n");
+            strload(str, temp, &i);
+            printf("construction: %s\n", temp);
+            strload(str, temp, &i);
+            printf("point_granularity: %s\n", temp);
             printf("deseja procurar outro?[s/n]\n");
-            scanf("%c",sel);
+            scanf("%c", &sel);
         }
         else{
             printf("\033[2J\033[1;1H");
             printf("registro nao encontrado, deseja procurar outro?[s/n]\n");
-            scanf("%c",sel);
+            scanf("%c",&sel);
         }
     }
 }
 
-void insere_registro(Btree **raiz) {
+void insere_registro(Btree *raiz) {
 	Key novo;
-	int k;
+	int k=0;
 	char policyID[6], statecode[2], county[15], eq_site_limit[15], hu_site_limit[15];
 	char fl_site_limit[15], fr_site_limit[15], tiv_2011[15], tiv_2012[15];
 	char eq_site_deductible[15], hu_site_deductible[15], fl_site_deductible[15], fr_site_deductible[15];

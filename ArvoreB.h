@@ -3,24 +3,17 @@
 #include <unistd.h>
 #include <math.h>
 #include <string.h>
+#include "structs.h"
 
-typedef struct btree Btree;
-typedef struct key Key;
-struct key{
-    char *chave;
-    long posicao;
-
-};
-
-struct btree{
-    Btree* filhos;
-    Btree *pai;
-    Key *chaves;
-    int ordem, numerodechaves, numerodoNo, numerodefilhos;
-};
 
 int CalcularOrdem(double);
-
+void malocaARV(Btree*);
+int insere_simples(Btree*, Key*);
+Btree* buscaNo(Btree*, char*, int*);
+void Keycpy(Key* dest, Key* src){
+    strcpy(dest->chave,src->chave);
+    dest->posicao = src->posicao;
+}
 Btree* CriarArvore(int tamanho){
     Btree *arvore=NULL;
     arvore = malloc(sizeof(Btree));
@@ -50,11 +43,13 @@ int CalcularOrdem(double tamanho){
 
 void GravarArvore(Btree* atual, FILE *arquivo){
     int i;
+    size_t tam;
     fwrite(&atual->numerodoNo,sizeof(int),1,arquivo);
     fwrite(&atual->numerodechaves,sizeof(int),1,arquivo);
     fwrite(&atual->numerodefilhos,sizeof(int),1,arquivo);
     while(i<atual->numerodechaves){
-        fwrite(strlen(atual->chaves[i].chave),sizeof(size_t),1,arquivo);
+        tam= strlen(atual->chaves[i].chave);
+        fwrite(&tam,sizeof(size_t),1,arquivo);
         fwrite(&atual->chaves[i].chave,sizeof(char)*strlen(atual->chaves[i].chave),1,arquivo);
         fwrite(&atual->chaves[i].posicao,sizeof(long),1,arquivo);
         i++;
@@ -85,7 +80,7 @@ void LerArvore(Btree* atual, FILE *arquivo, int ordem){
     atual->chaves = calloc(atual->numerodechaves,sizeof(Key));
     atual->filhos = calloc(atual->numerodefilhos,sizeof(Btree));
     while(i<atual->numerodechaves){
-        fread(temp,sizeof(size_t),1,arquivo);
+        fread(&temp,sizeof(size_t),1,arquivo);
         atual->chaves[i].chave = malloc(sizeof(char)*temp);
         fread(&atual->chaves[i].chave,sizeof(char)*temp,1,arquivo);
         fread(&atual->chaves[i].posicao,sizeof(long),1,arquivo);
@@ -111,32 +106,39 @@ int PreLer(Btree* raiz, char* nomeindice){
     return 1;
 }
 
-// long Busca(Btree* no, char* chave){
-//     int i,a;
-//     i=0;
-//     a=strcmp(chave, no->chaves[i].chave);
-//     while(a>=0 && i< no->numerodechaves){
-//         if(a==0){
-//             return no->chaves[i].posicao;
-//         }
-//         i++;
-//         if(i != no->numerodechaves){
-//             a=strcmp(chave, no->chaves[i].chave);
-//         }
-//     }
-//     if(a<0 || i == no->numerodechaves){
-//         return Busca(&no->filhos[i],chave);
-//     }
-//     return -1.0;
-// }
-
-Btree* BuscaNo(Btree* no, char* chave, int *local){
+long Busca(Btree* no, char* chave){
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);
     while(a>=0 && i< no->numerodechaves){
         if(a==0){
-            local =i;
+            return no->chaves[i].posicao;
+        }
+        i++;
+        if(i != no->numerodechaves){
+            a=strcmp(chave, no->chaves[i].chave);
+        }
+    }
+    if(a<0 || i == no->numerodechaves){
+        if(no->numerodefilhos>0){
+            return Busca(&no->filhos[i],chave);
+        }else{
+            return -1.0;
+        }
+    }
+    return -1.0;
+}
+
+Btree* buscaNo(Btree* no, char* chave, int *local){
+    int i,a;
+    i=0;
+    if(no->chaves==NULL){
+        return no;
+    }
+    a=strcmp(chave, no->chaves[i].chave);
+    while(a>=0 && i< no->numerodechaves){
+        if(a==0){
+            *local = i;
             return no;
         }
         i++;
@@ -145,8 +147,15 @@ Btree* BuscaNo(Btree* no, char* chave, int *local){
         }
     }
     if(a<0 || i == no->numerodechaves){
-        return Busca(&no->filhos[i],chave);
+        if(no->numerodefilhos>0){
+            return buscaNo(&no->filhos[i],chave, local);
+        }
+        else if(i== no->numerodechaves){
+            *local = -1;
+            return no;
+        }
     }
+    *local =-1;
     return NULL;
 }
 
@@ -176,7 +185,7 @@ int lotacao_min(Btree* no){//verifica se o no esta com a lotação minima antes 
 }
 
 void spliting(Btree *raiz) {//funcao que realiza o split precisa arrumar
-	int pos, pos2, i, counter, j, state;
+	int pos, counter, j;
 	Btree *paizao;
 	paizao = raiz->pai;
 	if (paizao == NULL) {//Caso nao tenha pai
@@ -205,47 +214,57 @@ void spliting(Btree *raiz) {//funcao que realiza o split precisa arrumar
 		spliting(paizao);
 }
 
-
-void desloca_arv(Btree *raiz, int pos) {//desloca os registros em um no para a insercao de um novo registro
-	int i;
-	for (i = raiz->numerodechaves; i>pos; i--)
-	{
-		raiz->filhos[i + 1] = raiz->filhos[i];
-		raiz->chaves[i].posicao = raiz->chaves[i - 1].posicao;
-		strcpy(raiz->chaves[i].chave, raiz->chaves[i - 1].chave);
-	}
-}
-
 int insere_simples(Btree *local, Key *novo) {//simplesmente insere um novo registro em um no
 	int i;
-	for (i = 0; i<local->numerodechaves; i++)
-	{
-		if (local->chaves[i].chave< novo->chave){
-			break;
-		}
+    Key *chaveiro;
+    i=0;
+    if(local->chaves== NULL){
+        local->chaves = malloc(sizeof(Key));
+        local->chaves[0].chave = malloc(sizeof(char)*strlen(novo->chave)+1);
+        strcpy(local->chaves[0].chave,novo->chave);
+        local->chaves->posicao = novo->posicao;
+        local->numerodechaves=1;
+        return -1;
+    }
+    chaveiro = calloc(local->numerodechaves+1, sizeof(Key));
+	while (strcmp(novo->chave,local->chaves[i].chave) >1 ){
+        chaveiro[i].chave = malloc(sizeof(char)*strlen(local->chaves[i].chave)+1);
+        strcpy(chaveiro[i].chave,local->chaves[i].chave);
+        chaveiro[i].posicao = local->chaves[i].posicao;
+        i++;  
 	}
-	desloca_arv(local, i);
-	local->chaves[i].posicao = novo->posicao;
-    local->chaves[i].chave = novo->chave;
+    chaveiro[i].chave = malloc(sizeof(char)*strlen(novo->chave)+1);
+    strcpy(chaveiro[i].chave,novo->chave);
+    chaveiro[i].posicao = novo->posicao;
+    while(i< local->numerodechaves){
+        chaveiro[i+1].chave = malloc(sizeof(char)*strlen(local->chaves[i].chave)+1);
+        strcpy(chaveiro[i+1].chave,local->chaves[i].chave);
+        chaveiro[i+1].posicao = local->chaves[i].posicao;
+        i++;
+    }
+    free(local->chaves);
+    local->chaves = chaveiro;
 	local->numerodechaves += 1;//aumenta-se o tamanho do no
+    
 	return i;
 }
 void insere(Btree *raiz, Key *novo) {
-	Btree *local;
-	int i;
-	local = busca(raiz, novo->chave);// busca local apropriado retorna local
-	if (cabe_no(local))//se cabe insere normal
-	{
-		i = insere_simples(local, novo);
-	}
-	else {
-        spliting(local);//chama a funcao de split
-		i = insere_simples(local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
-	}
-
+	Btree *local= NULL;
+	int i=0;
+	local = buscaNo(raiz, novo->chave, &i);// busca local apropriado retorna local
+    if(local !=NULL){
+        if (cabe_no(local))//se cabe insere normal
+        {
+            i = insere_simples(local, novo);
+        }
+        else {
+            spliting(local);//chama a funcao de split
+            i = insere_simples(local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
+        }
+    }
 }
 void malocaARV(Btree *no){// inicializa um novo no
-    int i;
+    // int i;
     no = malloc(sizeof(Btree));
     no->numerodechaves = 0;//tamanho inicial vazio=0
 }
@@ -313,12 +332,12 @@ void verificacoes(Btree *folha){
             lado = 1;
         }
     }
-    if( (esquerda->ordem / 2 ) -1 < esquerda->numerodechaves < (esquerda->ordem - 1) ){//verifica se � possivel fazer redistribui�ao com a arvore da esquerda
+    if( (esquerda->ordem / 2 ) -1 < esquerda->numerodechaves && esquerda->numerodechaves < (esquerda->ordem - 1) ){//verifica se � possivel fazer redistribui�ao com a arvore da esquerda
 
     redistribuicao(folha, esquerda, i+1, -1);
 
     }
-    else if((direita->ordem / 2 ) -1 < direita->numerodechaves < (direita->ordem - 1)){
+    else if((direita->ordem / 2 ) -1 <direita->numerodechaves && direita->numerodechaves < (direita->ordem - 1)){
 
     redistribuicao(folha, direita, i+1, 1);
 
@@ -335,7 +354,7 @@ void verificacoes(Btree *folha){
 
 void deleta(Btree *deletado, int posicao){//fornece o no onde esta a chave q queremos deletar e onde ela esta
     deletado->chaves[posicao].chave = NULL;
-    deletado->chaves[posicao].posicao = NULL;
+    deletado->chaves[posicao].posicao = -1;
     deletado->numerodechaves = deletado->numerodechaves-1;
 
 }
@@ -418,20 +437,20 @@ void exclui_tree(Btree *deletado, int posicao){
 
 
 void exclui(Btree* raiz, FILE* DB) {
-    char *nome_do_arquivo;
-	long nreg;
-	int posicao;
-	Btree *deletado;
-	char *chave;
+    char *nome_do_arquivo= NULL;
+	long nreg=0;
+	int posicao=0;
+	Btree *deletado = NULL;
+	char *chave =NULL;
     printf("\033[2J\033[1;1H");
 	printf("insira a chave do registro o qual deseja excluir: ");
-	scanf("%s", &chave);
+	scanf("%s", chave);
 	getchar();
     //deletado = busca(*raiz ,chave, posicao);
     if(deletado != NULL){
         nreg = deletado->chaves[posicao].posicao;
-        apagaLinha(nome_do_arquivo ,nreg);
-        apagaLinha(nome_do_arquivo ,nreg);
+        // apagaLinha(nome_do_arquivo ,nreg);
+        // apagaLinha(nome_do_arquivo ,nreg);
         exclui_tree(deletado, posicao);
     }else{
         printf("A busca falhou");
