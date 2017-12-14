@@ -130,21 +130,13 @@ int PreLer(Btree* raiz, char* nomeindice){
 //     return -1.0;
 // }
 
-<<<<<<< HEAD
 Btree* BuscaNo(Btree* no, char* chave, int *local){
-=======
-Btree* Busca(Btree* no, char* chave, int *local){
->>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
     int i,a;
     i=0;
     a=strcmp(chave, no->chaves[i].chave);
     while(a>=0 && i< no->numerodechaves){
         if(a==0){
-<<<<<<< HEAD
             local =i;
-=======
-		local = i;
->>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
             return no;
         }
         i++;
@@ -184,34 +176,29 @@ int lotacao_min(Btree* no){//verifica se o no esta com a lotação minima antes 
 }
 
 void spliting(Btree **raiz) {//funcao que realiza o split precisa arrumar
-	int pos, pos2, i;
+	int pos, pos2, i, counter, j, state;
 	Btree *paizao;
 	paizao = (*raiz)->pai;
 	if (paizao == NULL) {//Caso nao tenha pai
 		malocaARV(&paizao);
-		paizao->filhos[0] = raiz;
+		paizao->filhos[0] = **raiz;
 		(*raiz)->pai = paizao;
 	}
-
-	pos = insere_simples(&paizao, (*raiz)->chaves[2]);//insere o elemento que foi promovido
-
-
+	pos = insere_simples(&paizao, (*raiz)->chaves[((*raiz)->ordem)/2]);//insere o elemento que foi promovido
 	malocaARV(&(paizao->filhos[pos + 1]));//maloca o novo no resultante do split
 	paizao->filhos[pos + 1].pai = paizao;
-
 	//realizando a divisao de registros
-	paizao->filhos[pos + 1].chaves[0].posicao = (*raiz)->chaves[3].posicao;
-	strcpy(paizao->filhos[pos + 1].chaves[0].chave, (*raiz)->chaves[3].chave);
-	paizao->filhos[pos + 1].chaves[1].posicao = (*raiz)->chaves[4].posicao;
-	strcpy(paizao->filhos[pos + 1].chaves[1].chave, (*raiz)->chaves[4].chave);
+    counter = 0;
+    for(j=(int)((*raiz)->ordem)/2+1;j< ((*raiz)->ordem);j++){
+	   paizao->filhos[pos + 1].chaves[counter].posicao = (*raiz)->chaves[j].posicao;
+	   strcpy(paizao->filhos[pos + 1].chaves[counter].chave, (*raiz)->chaves[j].chave);
+       counter++;
 
-	paizao->filhos[pos + 1].filhos[0] = (*raiz)->filhos[3];
-	paizao->filhos[pos + 1].filhos[1] = (*raiz)->filhos[4];
-	paizao->filhos[pos + 1].filhos[2] = (*raiz)->filhos[5];
+    }
 
 	//registros agora possuem novos tamanhos
-	paizao->filhos[pos + 1].tamanho = 2;
-	(*raiz)->tamanho = 2;
+	paizao->filhos[pos + 1].numerodechaves = (((*raiz)->ordem) % 2 == 0? ((*raiz)->ordem)/2-1 : ((*raiz)->ordem)/2);
+	(*raiz)->numerodechaves = (int)(((*raiz)->ordem)/2);
 
 	//se o pai encher, precisamos de um novo split
 	if (paizao->numerodechaves == paizao->ordem/2)
@@ -233,8 +220,7 @@ int insere_simples(Btree *local, Key *novo) {//simplesmente insere um novo regis
 	int i;
 	for (i = 0; i<local->numerodechaves; i++)
 	{
-		if (local->chaves[i].chave< novo->chave)
-		{
+		if (local->chaves[i].chave< novo->chave){
 			break;
 		}
 	}
@@ -250,15 +236,207 @@ void insere(Btree *raiz, Key *novo) {
 	local = busca(raiz, novo->chave);// busca local apropriado retorna local
 	if (cabe_no(local))//se cabe insere normal
 	{
-		i = insere_simples(&local, novo);
+		i = insere_simples(local, novo);
 	}
 	else {
-		i = insere_simples(&local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
-		spliting(&local);//chama a funcao de split
+        spliting(local);//chama a funcao de split
+		i = insere_simples(local, novo);//vai forcar a insercao e vai ficar com o tamanho 5
 	}
-<<<<<<< HEAD
-}
-=======
 
 }
->>>>>>> cd3a2f6a13ce683c1d1179e0136748a1874fc42c
+void malocaARV(Btree *no){// inicializa um novo no
+    int i;
+    no = malloc(sizeof(Btree));
+    no->numerodechaves = 0;//tamanho inicial vazio=0
+}
+void concat(Btree *folha, Btree *irmao, int lado){
+
+    if(lado == -1){//caso irmao seja o da esquerda
+
+
+
+    }else{//caso irmao seja o da direita
+
+
+    }
+
+}
+void redistribuicao(Btree *folha, Btree *irmao, int eu, int irma){//aplica a redistribuicao, i(1 d, -1 e) � o numero da folha do pai dela
+
+    Key *pai, *substituto;
+    int i;
+
+    if(irma == -1){// para a irma sendo da esquerda
+        pai = &folha->pai->chaves[eu - 1];
+        substituto = &irmao->chaves[irmao->numerodechaves - 1];
+
+
+        for(i=0 ; i < folha->numerodechaves ; i++ ){//abre espa�o para o pai q vai entrar
+            folha->chaves[i+1] = folha->chaves[i];
+        }
+        folha->chaves[0] = *pai;
+        folha->numerodechaves = folha->numerodechaves +1;
+
+        //promove o substituto
+        folha->pai->chaves[eu - 1] = *substituto;
+
+
+        irmao->numerodechaves = irmao->numerodechaves - 1;
+    }else{//para irma sendo da direita
+        pai = &folha->pai->chaves[eu];
+        substituto = &irmao->chaves[0];
+
+
+        folha->chaves[folha->numerodechaves] = *pai;
+
+        folha->numerodechaves = folha->numerodechaves + 1;
+
+        for(i=0; i < irmao->numerodechaves;i++){ //retira o espa� do substituto
+                irmao->chaves[i] = irmao->chaves[i+1];
+        }
+        folha->pai->chaves[eu] = *substituto;
+    }
+}
+
+void verificacoes(Btree *folha){
+    int i, lado;
+    Btree *direita, *esquerda, *irma;
+    char *maior, *menor;
+    maior = folha->chaves[folha->numerodechaves - 1].chave;
+    menor = folha->chaves[0].chave;
+    for(i=0; i<folha->pai->numerodechaves ;i++){//acha chaves irmas
+        if(folha->pai->chaves[i].chave < menor){
+            esquerda = &folha->pai->filhos[i];
+            direita = &folha->pai->filhos[i+2];
+            irma = esquerda;
+            lado = -1;
+        }else{
+            i = 0;
+            direita = &folha->pai->filhos[1];
+            irma = direita;
+            lado = 1;
+        }
+    }
+    if( (esquerda->ordem / 2 ) -1 < esquerda->numerodechaves < (esquerda->ordem - 1) ){//verifica se � possivel fazer redistribui�ao com a arvore da esquerda
+
+    redistribuicao(folha, esquerda, i+1, -1);
+
+    }
+    else if((direita->ordem / 2 ) -1 < direita->numerodechaves < (direita->ordem - 1)){
+
+    redistribuicao(folha, direita, i+1, 1);
+
+    }else{
+
+    concat(folha, irma, lado );
+
+    }
+    if(folha->pai->numerodechaves < (folha->ordem / 2) ){
+        verificacoes(folha->pai);
+
+    }
+}
+
+void deleta(Btree *deletado, int posicao){//fornece o no onde esta a chave q queremos deletar e onde ela esta
+    deletado->chaves[posicao].chave = NULL;
+    deletado->chaves[posicao].posicao = NULL;
+    deletado->numerodechaves = deletado->numerodechaves-1;
+
+}
+Btree* busca_folha (Btree *deletado, int posicao){
+    Btree *esquerda, *direita;
+    esquerda = &deletado->filhos[posicao];
+    direita = &deletado->filhos[posicao+1];
+    while(esquerda->numerodefilhos != 0){
+            esquerda = &esquerda->filhos[esquerda->numerodechaves-1];
+    }
+    while(direita->numerodefilhos != 0){
+            direita = &direita->filhos[0];
+
+    }
+    if(esquerda->numerodechaves < direita->numerodechaves){
+        return direita;
+    }else{
+        return esquerda;
+    }
+}
+
+Btree* troca_pai(Btree *deletado, int posicao){
+    char *chave_filho;
+    Btree *folha;
+
+    if(deletado->filhos[posicao].numerodechaves < deletado->filhos[posicao+1].numerodechaves){//caso ramo da direita
+        chave_filho = deletado->filhos[posicao+1].chaves[0].chave;
+        deletado->filhos[posicao+1].chaves[0].chave = deletado->chaves[posicao].chave;
+        deletado->chaves[posicao].chave = chave_filho;
+        folha = &deletado->filhos[posicao+1];
+        return folha;
+    }else{// caso filho da esquerda
+        chave_filho = deletado->filhos[posicao+1].chaves[deletado->filhos->numerodechaves].chave;
+        deletado->filhos[posicao+1].chaves[deletado->filhos->numerodechaves-1].chave = deletado->chaves[posicao].chave;
+        deletado->chaves[posicao].chave = chave_filho;
+        folha = &deletado->filhos[posicao+1];
+        return folha;
+    }
+}
+
+void exclui_tree(Btree *deletado, int posicao){
+    Btree *folha;
+    char *chave_filho;
+    if(deletado->numerodefilhos == 0){ //verifica se ela � pai
+        if(deletado->filhos[posicao].numerodefilhos != 0 && deletado->filhos[posicao+1].numerodefilhos != 0){//verifica se ela � pai de pai
+           folha = busca_folha(deletado, posicao);
+           if(folha->chaves[folha->numerodechaves+1].chave <deletado->chaves[posicao].chave){ //caso seja a folha da esquerda
+                chave_filho = folha->chaves[folha->numerodechaves-1].chave;
+                folha->chaves[folha->numerodechaves-1].chave = deletado->chaves[posicao].chave;
+                deletado->chaves[posicao].chave = chave_filho;
+                deleta(folha, folha->numerodechaves-1);
+
+           }else{//caso seja a folha da direita
+                chave_filho = folha->chaves[0].chave;
+                folha->chaves[0].chave = deletado->chaves[posicao].chave;
+                deletado->chaves[posicao].chave = chave_filho;
+                deleta(folha, 0);
+            }
+        }else{//caso ela seja pai, mas n�o pai de pai
+            folha = troca_pai(deletado, posicao);
+            if(folha->chaves[folha->numerodechaves-1].chave <deletado->chaves[posicao].chave){ //caso seja a folha da esquerda
+               deleta(folha, folha->numerodechaves-1);
+            }else{// caso seja a folha da direita
+                deleta(folha,0);
+            }
+        }
+    }else{//caso ela n�o seja pai
+        folha = deletado;
+        deleta(folha, posicao);
+    }
+    //verifica��es
+    if(folha->numerodechaves > (folha->ordem/2)-1){
+        //fim
+    }else{//nao possui o minimo de chaves
+
+        verificacoes(folha);
+
+    }
+}
+
+
+void exclui() {
+    char *nome_do_arquivo;
+	long nreg;
+	int posicao;
+	Btree *deletado;
+	char *chave;
+	printf("insira a chave do registro o qual deseja excluir: ");
+	scanf("%c", &chave);
+	getchar();
+    //deletado = busca(*raiz ,chave, posicao);
+    if(deletado != NULL){
+        nreg = deletado->chaves[posicao].posicao;
+        apagaLinha(nome_do_arquivo ,nreg);
+        apagaLinha(nome_do_arquivo ,nreg);
+        exclui_tree(deletado, posicao);
+    }else{
+        printf("A busca falhou");
+    }
+}
