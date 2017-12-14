@@ -53,7 +53,12 @@ void GravarArvore(Btree* atual, FILE *arquivo){
     fwrite(&atual->numerodoNo,sizeof(int),1,arquivo);
     fwrite(&atual->numerodechaves,sizeof(int),1,arquivo);
     fwrite(&atual->numerodefilhos,sizeof(int),1,arquivo);
-    fwrite(&atual->chaves,sizeof(Key),atual->numerodechaves,arquivo);
+    while(i<atual->numerodechaves){
+        fwrite(strlen(atual->chaves[i].chave),sizeof(size_t),1,arquivo);
+        fwrite(&atual->chaves[i].chave,sizeof(char)*strlen(atual->chaves[i].chave),1,arquivo);
+        fwrite(&atual->chaves[i].posicao,sizeof(long),1,arquivo);
+        i++;
+    }
     if(atual->numerodefilhos>0){
         for(i=0;i<atual->numerodefilhos;i++){
             GravarArvore(&atual->filhos[i],arquivo);
@@ -61,9 +66,9 @@ void GravarArvore(Btree* atual, FILE *arquivo){
     }
 }
 
-void PreGravar(Btree* raiz){
+void PreGravar(Btree* raiz, char *nomeindice){
     FILE* arquivo;
-    arquivo=fopen("indicelista.bt","wb");
+    arquivo=fopen(nomeindice,"wb");
     fwrite(&raiz->ordem,sizeof(int),1,arquivo);
     GravarArvore(raiz,arquivo);
     fclose(arquivo);
@@ -72,13 +77,21 @@ void PreGravar(Btree* raiz){
 
 void LerArvore(Btree* atual, FILE *arquivo, int ordem){
     int i;
+    size_t temp;
     atual->ordem=ordem;
     fread(&atual->numerodoNo,sizeof(int),1,arquivo);
     fread(&atual->numerodechaves,sizeof(int),1,arquivo);
     fread(&atual->numerodefilhos,sizeof(int),1,arquivo);
     atual->chaves = calloc(atual->numerodechaves,sizeof(Key));
-    atual->filhos = calloc(atual->numerodefilhos,sizeof(Btree*));
-    fread(&atual->chaves,sizeof(Key),atual->numerodechaves,arquivo);
+    atual->filhos = calloc(atual->numerodefilhos,sizeof(Btree));
+    while(i<atual->numerodechaves){
+        fread(temp,sizeof(size_t),1,arquivo);
+        atual->chaves[i].chave = malloc(sizeof(char)*temp);
+        fread(&atual->chaves[i].chave,sizeof(char)*temp,1,arquivo);
+        fread(&atual->chaves[i].posicao,sizeof(long),1,arquivo);
+        i++;
+    }
+    // fread(&atual->chaves,sizeof(Key),atual->numerodechaves,arquivo);
     if(atual->numerodefilhos>0){
         for(i=0;i<atual->numerodefilhos;i++){
             LerArvore(&atual->filhos[i],arquivo,ordem);
@@ -86,9 +99,9 @@ void LerArvore(Btree* atual, FILE *arquivo, int ordem){
     }
 }
 
-int PreLer(Btree* raiz, char* nome){
+int PreLer(Btree* raiz, char* nomeindice){
     FILE* arquivo;
-    arquivo=fopen(nome,"rb");
+    arquivo=fopen(nomeindice,"rb");
     if (arquivo == NULL){
         return 0;
     }
