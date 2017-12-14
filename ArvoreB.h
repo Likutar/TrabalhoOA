@@ -7,7 +7,7 @@
 typedef struct btree Btree;
 typedef struct key Key;
 struct key{
-    char chave[7];
+    char *chave;
     long posicao;
 };
 
