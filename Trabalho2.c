@@ -1,11 +1,11 @@
 #include "ArvoreB.h"
 
-Btree* parse(FILE*);
+void parse(FILE*);
 
-void escolher_busca(Btree*);
-void insere_registro(Btree*);
+void escolher_busca();
+void insere_registro();
 int main (){
-    Btree *arvore= NULL;
+    // Btree *arvore= NULL;
     FILE *DB= NULL;
     char loop=1;
     char nome[30];
@@ -25,15 +25,15 @@ int main (){
             sel++;
         }
         strcat(nomeindice, "_indicelista.bt");
-        if(PreLer(arvore, nomeindice)==0){
+        if(PreLer(nomeindice)==0){
             DB = fopen(nome,"r");
-            arvore = parse(DB);
+            parse(DB);
         }
     }
     else{
-        if(PreLer(arvore, "indicelista.bt")==0){
+        if(PreLer("indicelista.bt")==0){
             DB = fopen("data.txt","r");
-            arvore = parse(DB);
+            parse(DB);
         }
     }
     while (loop == 1){
@@ -43,27 +43,26 @@ int main (){
         
         switch(sel){
             case 1:
-                escolher_busca(arvore);
+                escolher_busca();
                 break;
             case 2:
-                insere_registro(arvore);
+                insere_registro();
                 break;
             case 3:
-                exclui(arvore, DB);
+                exclui(raiz,DB);
                 break;
             case 4:
             default:
                 loop = 0;
         }
     }
-    printf("tamanho da arvore= %d\n", arvore->ordem);
-    dealloc(arvore);
+    printf("tamanho da arvore= %d\n", ordem);
+    dealloc(raiz);
    return 0;
 }
 
-Btree* parse(FILE *DB){
+void parse(FILE *DB){
     char str[200];
-    Btree *arvore= NULL;
     int i, tamanho;
     Key chaveprim;
     fseek(DB,0, 0);
@@ -72,8 +71,7 @@ Btree* parse(FILE *DB){
          tamanho++;
      }
     fseek(DB,0,0);
-    arvore=CriarArvore(tamanho);
-    
+    CriarArvore(tamanho);
     while(fgets(str,200, DB)!=NULL){
         i=0;
         while(str[i]!=',' && str[i]!= '\n'){
@@ -88,11 +86,12 @@ Btree* parse(FILE *DB){
         strncpy(chaveprim.chave,str, i);
         chaveprim.chave[i]='\0';
         chaveprim.posicao = (long)ftell;
-        // printf("chave =%s \n", chaveprim.chave);
-        insere(arvore, &chaveprim);
-
+        insere(&chaveprim);
+        // if(raiz->filhos!=NULL){
+            // printf("ok\n");
+            // sleep(10);
+        // }
     }
-    return arvore;
 }
 void strload(char* str, char *temp, int *i){
     int posicao=0;
@@ -103,7 +102,7 @@ void strload(char* str, char *temp, int *i){
     }
     *i++;
 }
-void escolher_busca(Btree *arvore){
+void escolher_busca(){
     char chave[7], str[150], temp[15], sel;
     long posicao;
     int i=0;
@@ -113,7 +112,7 @@ void escolher_busca(Btree *arvore){
         printf("\033[2J\033[1;1H");
         printf("Qual a chave do registro que deseja achar?\n");
         scanf("%s", chave);
-        posicao = Busca(arvore, chave);
+        posicao = Busca(raiz, chave);
         if(posicao != -1.0){
             DB = fopen("data.txt", "r");
             fseek(DB,posicao , 0);
@@ -166,7 +165,7 @@ void escolher_busca(Btree *arvore){
     }
 }
 
-void insere_registro(Btree *raiz) {
+void insere_registro() {
 	Key novo;
 	int k=0;
 	char policyID[6], statecode[2], county[15], eq_site_limit[15], hu_site_limit[15];
@@ -264,7 +263,7 @@ void insere_registro(Btree *raiz) {
 	// inserir na arvore
 	novo.posicao = k;
     strcpy(novo.chave, policyID);
-	insere(raiz,&novo);
+	insere(&novo);
 }
 
 
