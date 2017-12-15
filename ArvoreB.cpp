@@ -108,10 +108,10 @@ public:
     No *busca(Key k){
         int i = 0;
         while (i < numerodechaves && k.chave >chaves[i].chave){
-            cout << "chave["<< i<<"]= "<<chaves[i].chave<<"tam="<<chaves[i].chave.length()<<'\n';
             i++;
         }
-        if (chaves[i].chave == k.chave){
+        cout << "chave["<< i<<"]= "<<chaves[i].chave<<"k="<<k.chave<<'\n';
+        if (chaves[i].chave.compare(k.chave)==0){
             return this;
         }
         if (folha == true){
@@ -185,24 +185,24 @@ public:
     }
     void Carregar(fstream& arq){
         int i=0;
-        unsigned j=0;
         unsigned a=0;
-        char *temp;
+        char *temp= NULL;
         arq.read((char*)&numerodechaves,sizeof(int));
         arq.read((char*)&folha,sizeof(bool));
         for(i=0;i<numerodechaves;i++){
+            chaves[i].chave= " ";
             arq.read((char*)&a,sizeof(a));
-            cout << a << '\n';
-            temp = new char[a];
+            temp = new char[a+1];
             arq.read(temp,sizeof(char)*a);
-            chaves[i].chave.assign(temp);
+            temp[a] = '\0';
+            chaves[i].chave.replace(0,a-1,temp);
             arq.read((char*)&chaves[i].posicao,sizeof(long));
             delete[] temp;
         }
         if(folha==false){
             for(i=0;i<=numerodechaves;i++){
                 filhos[i] = new No(minimo, true);
-                filhos[i]->Gravar(arq);
+                filhos[i]->Carregar(arq);
             }
         }
     }
