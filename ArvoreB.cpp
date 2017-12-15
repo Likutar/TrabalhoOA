@@ -442,7 +442,48 @@ public:
         }
     }
     void Excluir_Registro(string &nome, string &nomeindice){
-
+        int sel;
+        fstream DB;
+        string linha;
+        No *temp;
+        Key k;
+        long pos;
+        bool loop= true;
+        while(loop){
+            cout <<"\033[2J\033[1;1H";
+            cout <<"Qual chave deseja excluir?\n";
+            getline(cin,k.chave);
+            temp = busca(k);
+            if (temp ==NULL){
+                cout << "erro, chave nao encontrada, deseja procurar outra?\n1)Sim\n2)Nao\n";
+                getline(cin,linha);
+                sel = atoi(linha.c_str());
+                if(sel==2){
+                    loop=false;
+                }
+            }else{
+                pos = temp->PosicaoRegistro(temp->acharChave(k));
+                DB.open(nome.c_str());
+                if(DB.is_open()){
+                    DB.seekg(pos);
+                    getline(DB,linha);
+                    DB.seekg(pos);
+                    DB.seekp(pos);
+                    linha.replace(0,string::npos,linha.length(),' ');
+                    DB<< linha;
+                    cout << "deseja excluir outra chave?\n1)Sim\n2)Nao\n";
+                    getline(cin,linha);
+                    sel = atoi(linha.c_str());
+                    if(sel==2){
+                        loop=false;
+                    }
+                }else{
+                    cout << "erro, arquivo nao encontrado ";
+                    loop=false;
+                }
+                DB.close();
+            }
+        }
     }
     void Inserir_Registro(string &nome, string &nomeindice){
 
