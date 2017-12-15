@@ -4,9 +4,9 @@
 using namespace std;
 struct Key{
     string chave;
-    unsigned posicao;
+    long posicao;
     Key(){
-        posicao=0;
+        posicao=-1;
         chave = " ";
     }
 };
@@ -105,9 +105,10 @@ public:
             filhos[i]->destruir();
         }
     }
-    No *busca(Key &k){
+    No *busca(Key k){
         int i = 0;
-        while (i < numerodechaves && k.chave > chaves[i].chave){
+        while (i < numerodechaves && k.chave >chaves[i].chave){
+            cout << "chave["<< i<<"]= "<<chaves[i].chave<<"tam="<<chaves[i].chave.length()<<'\n';
             i++;
         }
         if (chaves[i].chave == k.chave){
@@ -123,6 +124,9 @@ public:
         while (i<numerodechaves && chaves[i].chave < k.chave)
             i++;
         return i;
+    }
+    long PosicaoRegistro(int i){
+        return chaves[i].posicao;
     }
     void remover(Key &k){
         bool flag;
@@ -168,15 +172,12 @@ public:
         arq.write((char*)&numerodechaves,sizeof(int));
         arq.write((char*)&folha,sizeof(bool));
         for(i=0;i<numerodechaves;i++){
-            // cout << "i= "<< i<< '\n';
             a = chaves[i].chave.length();
             arq.write((char*)&a,sizeof(a));
             arq.write(chaves[i].chave.c_str(),sizeof(char)*a);
-            arq.write((char*)&chaves[i].posicao,sizeof(unsigned));
-            // arq << chaves[i].chave << '%'<< chaves[i].posicao <<'|';
+            arq.write((char*)&chaves[i].posicao,sizeof(long));
         }
         if(folha==false){
-            // arq << '\n';
             for(i=0;i<=numerodechaves;i++){
                 filhos[i]->Gravar(arq);
             }
@@ -191,13 +192,11 @@ public:
         arq.read((char*)&folha,sizeof(bool));
         for(i=0;i<numerodechaves;i++){
             arq.read((char*)&a,sizeof(a));
+            cout << a << '\n';
             temp = new char[a];
             arq.read(temp,sizeof(char)*a);
-            for(j=0;j<a;j++){
-                chaves[i].chave+= temp[j];
-            }
-            // chaves[i].chave = temp;
-            arq.read((char*)&chaves[i].posicao,sizeof(unsigned));
+            chaves[i].chave.assign(temp);
+            arq.read((char*)&chaves[i].posicao,sizeof(long));
             delete[] temp;
         }
         if(folha==false){
@@ -332,7 +331,6 @@ public:
     BTree(int m){
         raiz = NULL;
         minimo = m;
-        cout << "minimo ="<< minimo<< '\n';
     }
     ~BTree(){
         raiz->destruir();
@@ -378,7 +376,6 @@ public:
                 arq.open("indicelista.bt",ios::binary| ios::out|ios::trunc);
             }
             // arq << minimo <<'|';
-            cout << "minimo="<< minimo<<'\n';
             arq.write((char*)&minimo,sizeof(int));
             raiz->Gravar(arq);
             arq.close();
@@ -402,5 +399,55 @@ public:
             }
             delete temp;
         }
+    }
+    void Escolher_Busca(string &nome){
+        int sel;
+        fstream DB;
+        string linha;
+        No *temp;
+        Key k;
+        long pos;
+        bool loop= true;
+        while(loop){
+            cout <<"\033[2J\033[1;1H";
+            cout <<"Qual chave deseja pesquisar?\n";
+            getline(cin,k.chave);
+            temp = busca(k);
+            if (temp ==NULL){
+                cout << "erro, chave nao encontrada, deseja procurar outra?\n1)Sim\n2)Nao\n";
+                getline(cin,linha);
+                sel = atoi(linha.c_str());
+                if(sel==2){
+                    loop=false;
+                }
+            }else{
+                pos = temp->PosicaoRegistro(temp->acharChave(k));
+                DB.open(nome.c_str());
+                if(DB.is_open()){
+                    DB.seekg(pos);
+                    getline(DB,linha);
+                    cout << linha << '\n';
+                    cout << "deseja procurar outra chave?\n1)Sim\n2)Nao\n";
+                    getline(cin,linha);
+                    sel = atoi(linha.c_str());
+                    if(sel==2){
+                        loop=false;
+                    }
+                }else{
+                    cout << "erro, arquivo nao encontrado ";
+                    loop=false;
+                }
+                DB.close();
+            }
+        }
+    }
+    void Excluir_Registro(string &nome, string &nomeindice){
+
+    }
+    void Inserir_Registro(string &nome, string &nomeindice){
+
+    }
+    void Alterar_Registro(string &nome, string &nomeindice){
+
     }
 };

@@ -39,43 +39,95 @@ BTree* parse(fstream &DB){
     chaveprim.posicao = DB.tellg();
     while(getline(DB,linha)){
         i=0;
-        // cout <<"\nmeh "<< str;
         chaveprim.chave =" ";
         while(linha[i]!=','){
-            chaveprim.chave += linha[i];
             i++;
         }
+        chaveprim.chave = linha.substr(0, i);
         if(i== linha.length()){
             cout << "erro, arquivo invalido\n";
         }
         raiz->inserir(chaveprim);
         chaveprim.posicao = DB.tellg();
+        linha =" ";
     }
     return raiz;
 }
-bool Carregar(fstream &arq, BTree *raiz){
-        arq.open("indicelista.bt",ios::binary| ios::in);
-        if(arq.is_open()){
-            int minimo=0;
-            arq.read((char*)&minimo,sizeof(int));
-            raiz = new BTree(minimo);
-            raiz->Carregar(arq);
-        }else{
-            return false;
-        }
-        arq.clear();
-        arq.close();
-        return true;
+BTree* Carregar(string &nomeindice){
+    int minimo;
+    fstream arq;
+    BTree *raiz=NULL;
+    arq.open((nomeindice).c_str(),ios::binary| ios::in);
+    if(arq.is_open()){
+        arq.read((char*)&minimo,sizeof(int));
+        raiz = new BTree(minimo);
+        raiz->Carregar(arq);
+    }else{
+        return NULL;
+    }
+    arq.clear();
+    arq.close();
+    return raiz;
 }
 
 int main(){   
     BTree *raiz= NULL;
     fstream DB, arq;
-    string linha;
-    DB.open("data.txt");
-    if (!Carregar(arq,raiz)){
-        cout << "parse\n";
-        raiz = parse(DB);
+    string linha, nome,nomeindice;
+    int sel=0;
+    bool loop=true;
+    cout <<"\033[2J\033[1;1H";
+    cout <<"Qual arquivo deseja abrir?\n";
+    cout <<"1) data.txt\n2) outro\n";
+    getline(cin,linha);
+    if (linha[0]== '2'){
+        cout<< "Qual o nome do arquivo?\n";
+        cin >> nome;
+        sel=0;
+        while(nome[sel]!='.'){
+            nomeindice+= nome[sel];
+            sel++;
+        }
+        nomeindice+="_indicelista.bt";
+        raiz = Carregar(nomeindice);
+        if (raiz == NULL){
+            DB.open(nome.c_str());
+            raiz = parse(DB);
+            DB.close();
+        }
+    }
+    else{
+        nome = "data.txt";
+        nomeindice ="indicelista.bt";
+        raiz = Carregar(nomeindice);
+        cout << "ok\n";
+        if (raiz == NULL){
+            DB.open("data.txt");
+            raiz = parse(DB);
+            DB.close();
+        }   
+    }
+    while (loop){
+        cout <<"\033[2J\033[1;1H";
+        cout <<"Qual operação deseja realizar\n1) Buscar\n2) adicionar\n3)excluir\n4)alterar\n5)sair\n";
+        getline(cin,linha);
+        sel=atoi(linha.c_str());
+        switch(sel){
+            case 1:
+                raiz->Escolher_Busca(nome);
+                break;
+            case 2:
+                raiz->Inserir_Registro(nome, nomeindice);
+                break;
+            case 3:
+                raiz->Excluir_Registro(nome, nomeindice);
+                break;
+            case 4:
+                raiz->Alterar_Registro(nome, nomeindice);
+                break;
+            default:
+                loop = 0;
+        }
     }
     cout << "arvore pronta\n";
     raiz->Gravar(arq);
