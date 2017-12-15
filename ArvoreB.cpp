@@ -486,7 +486,48 @@ public:
         }
     }
     void Inserir_Registro(string &nome, string &nomeindice){
-
+        int sel;
+        fstream DB;
+        string linha,str;
+        No *temp;
+        Key k;
+        long pos;
+        bool loop= true;
+        while(loop){
+            cout <<"\033[2J\033[1;1H";
+            cout <<"Forneça a chave primaria:\n";
+            getline(cin,k.chave);
+            temp = busca(k);
+            if(temp ==NULL){
+                str+='\n';
+                str+= k.chave;
+                for(sel=0;sel<18;sel++){
+                    cout << "insira o valor do campo numero "<< sel+1<<":\n";
+                    getline(cin,linha);
+                    str+= ',';
+                    str+= linha;
+                }
+                DB.open(nome.c_str(), ios::app);
+                if(DB.is_open()){
+                    DB.clear();
+                    DB << str;
+                    k.posicao = DB.tellp();
+                    inserir(k);
+                    DB.close();
+                    cout << "deseja adicionar outra chave?\n1)Sim\n2)Nao\n";
+                    getline(cin,linha);
+                    sel = atoi(linha.c_str());
+                    if(sel==2){
+                        loop=false;
+                    }
+                }else{
+                    cout << "erro, arquivo nao encontrado ";
+                    loop=false;
+                }
+            }else{
+                cout << "essa chave primaria ja existe, tente outra\n";
+            }
+        }
     }
     void Alterar_Registro(string &nome, string &nomeindice){
 
