@@ -87,10 +87,7 @@ void parse(FILE *DB){
         chaveprim.chave[i]='\0';
         chaveprim.posicao = (long)ftell;
         insere(&chaveprim);
-        // if(raiz->filhos!=NULL){
-            // printf("ok\n");
-            // sleep(10);
-        // }
+
     }
 }
 void strload(char* str, char *temp, int *i){
