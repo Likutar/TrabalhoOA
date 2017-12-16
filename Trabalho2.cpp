@@ -2,7 +2,7 @@
 #include <fstream>
 #include"ArvoreB.cpp"
 
-int CalcularMinimo(double tamanho){
+int CalcularMinimo(double tamanho){//função usada para calcular a ordem, porém ela fornesce a ordem/2 por motivos de praticidade
     double m=3.0;
     double n,temp,i;
     n=0.0;
@@ -53,7 +53,7 @@ BTree* parse(fstream &DB){
     }
     return raiz;
 }
-BTree* Carregar(string &nomeindice){
+BTree* Carregar(string &nomeindice){//função responsável por carregar a árvore de um arquivo
     int minimo;
     fstream arq;
     BTree *raiz=NULL;
@@ -77,7 +77,7 @@ int main(){
     int sel=0;
     bool loop=true;
     cout <<"\033[2J\033[1;1H";
-    cout <<"Qual arquivo deseja abrir?\n";
+    cout <<"Qual arquivo deseja abrir?\n";//escolha do arquivo de registros
     cout <<"1) data.txt\n2) outro\n";
     getline(cin,linha);
     if (linha[0]== '2'){
@@ -106,29 +106,29 @@ int main(){
             DB.close();
         }   
     }
-    while (loop){
+    while (loop){//mosta o menu para o usuário
         cout <<"\033[2J\033[1;1H";
         cout <<"Qual operação deseja realizar\n1) Buscar\n2) adicionar\n3)excluir\n4)alterar\n5)sair\n";
         getline(cin,linha);
         sel=atoi(linha.c_str());
         switch(sel){
-            case 1:
+            case 1://caso queria buscar uma chave
                 raiz->Escolher_Busca(nome);
                 raiz->Gravar(arq);
                 break;
-            case 2:
+            case 2://caso queira inserir um registro
                 raiz->Inserir_Registro(nome, nomeindice);
                 raiz->Gravar(arq);
                 break;
-            case 3:
+            case 3://caso queira excluir um registro
                 raiz->Excluir_Registro(nome, nomeindice);
                 raiz->Gravar(arq);
                 break;
-            case 4:
+            case 4://caso queira alterarum registro
                 raiz->Alterar_Registro(nome, nomeindice);
                 raiz->Gravar(arq);
                 break;
-            default:
+            default://caso saia do programa
                 loop = 0;
                 raiz->Gravar(arq);
         }
