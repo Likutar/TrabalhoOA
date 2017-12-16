@@ -27,24 +27,24 @@ public:
     void InserirNaoCheio(Key k){//insere um Key caso o arquivo não esteja cheio
         int i = numerodechaves-1;
         if (folha == true){//caso nó o onde a key vai ser inserida seja uma folha 
-            while (i >= 0 && chaves[i].chave > k.chave){
+            while (i >= 0 && chaves[i].chave > k.chave){// conta até a key antes da nova ser inserida
                 chaves[i+1] = chaves[i];
                 i--;
             }
-            if(i>=0 && chaves[i].chave.compare(k.chave)==0){
+            if(i>=0 && chaves[i].chave.compare(k.chave)==0){//da erro caso a key ja exista
                 cout << "erro, chave repitida\n";
                 
-            }else{
+            }else{//caso ela não seja repetida
                 chaves[i+1] = k;
                 numerodechaves++;
             }
         }
-        else{
-            while (i >= 0 && chaves[i].chave > k.chave){
+        else{//caso o nó não seja uma folha
+            while (i >= 0 && chaves[i].chave > k.chave){//sera o valor de i.
                 i--;
             }
-            if (filhos[i+1]->numerodechaves == 2*minimo-1){
-                Borbulhar(i+1, filhos[i+1]);
+            if (filhos[i+1]->numerodechaves == 2*minimo-1){//verifica se a quantidade de chaves no filho é o máximo
+                Borbulhar(i+1, filhos[i+1]);//chama a função borbulhar
                 if (chaves[i+1].chave < k.chave){
                     i++;
                 }
@@ -52,20 +52,20 @@ public:
             filhos[i+1]->InserirNaoCheio(k);
         }
     }
-    void Borbulhar(int pos, No *n){
+    void Borbulhar(int pos, No *n){//função responsável pela promoção de uma key criacão de um de seus filhos
         int i;
-        No *novo = new No(n->minimo, n->folha);
+        No *novo = new No(n->minimo, n->folha);//cria um novo nó
         novo->numerodechaves = minimo-1;
     
-        for (i=0;i<minimo-1;i++){
+        for (i=0;i<minimo-1;i++){//passa chaves para o novo nó criado
             novo->chaves[i] = n->chaves[i+minimo];
         }
-        if (n->folha == false){
+        if (n->folha == false){//caso não seja uma folha
             for (i=0;i<minimo;i++){
                 novo->filhos[i] = n->filhos[i+minimo];
             }
         }
-        n->numerodechaves = minimo - 1;
+        n->numerodechaves = minimo - 1;//ajusta o número de chaves
         for (i=numerodechaves;i>=pos+1;i--){
             filhos[i+1] = filhos[i];
         }
@@ -76,7 +76,7 @@ public:
         chaves[pos] = n->chaves[minimo-1];
         numerodechaves++;
     }
-    void percorrer(){
+    void percorrer(){//função responsável por percorrer a árvore
         int i;
         for (i=0;i<numerodechaves; i++){
             if (folha == false){
@@ -88,14 +88,14 @@ public:
             filhos[i]->percorrer();
         }
     }
-    void destruir(){
+    void destruir(){//função responsavel por apagar um nó
         int i=0;
         for (i=0;i<numerodechaves; i++){
             if (folha == false){
                 filhos[i]->destruir();
                 
             }
-            if(folha ==true){
+            if(folha ==true){//caso ele seja una folha
                 delete[] filhos;
                 delete[] chaves;
                 return;
@@ -105,7 +105,7 @@ public:
             filhos[i]->destruir();
         }
     }
-    No *busca(Key k){
+    No *busca(Key k){//função responsável por buscar um nó dado um Key 
         int i = 0;
         while (i < numerodechaves && k.chave >chaves[i].chave){
             i++;
@@ -118,7 +118,7 @@ public:
         }
         return filhos[i]->busca(k);
     }
-    int acharChave(Key k){
+    int acharChave(Key k){//função responsavel por achar a Key no vetor de keys do nó
         int i=0;
         while (i<numerodechaves && chaves[i].chave < k.chave)
             i++;
@@ -127,7 +127,7 @@ public:
     long PosicaoRegistro(int i){
         return chaves[i].posicao;
     }
-    void remover(Key k){
+    void remover(Key k){//função responsável por remover uma key
         bool flag;
         int i = acharChave(k);
         if (i < numerodechaves && chaves[i].chave == k.chave){
@@ -158,14 +158,14 @@ public:
         }
         return;
     }
-    void removerFolha (int i){
+    void removerFolha (int i){//função responsavel por remover remover uma Key da folha
         int a;
         for (a=i+1; a<numerodechaves; a++){
             chaves[a-1] = chaves[a];
         }
         numerodechaves--;
     }
-    void Gravar(fstream& arq){
+    void Gravar(fstream& arq){//função responsavel por gravar a árvore em um arquivo
         int i=0;
         unsigned a=0;
         arq.write((char*)&numerodechaves,sizeof(int));
@@ -182,7 +182,7 @@ public:
             }
         }
     }
-    void Carregar(fstream& arq){
+    void Carregar(fstream& arq){//função responsavél por gerar a árvpre de um arquivo
         int i=0;
         unsigned a=0;
         char *temp= NULL;
@@ -219,7 +219,7 @@ public:
         }
         return atual->chaves[0];
     }
-    void removerNaoFolha(int i){
+    void removerNaoFolha(int i){//função responsável por remover caso a Key não esteja numa folha
         Key k = chaves[i];
         Key esque, dire;
         if (filhos[i]->numerodechaves >= minimo){
@@ -237,7 +237,7 @@ public:
             filhos[i]->remover(k);
         }
     }
-    void EsquerdaDireita(int i){
+    void EsquerdaDireita(int i){//função repomsasvel por auxiliar a concatenação
         int a;
         No *filho=filhos[i];
         No *irmao=filhos[i-1];
@@ -258,7 +258,7 @@ public:
         filho->numerodechaves ++;
         irmao->numerodechaves --;
     }
-    void DireitaEsqurda(int i){
+    void DireitaEsqurda(int i){//função repomsasvel por auxiliar a concatenação
         int a;
         No *filho=filhos[i];
         No *irmao=filhos[i+1];
@@ -278,7 +278,7 @@ public:
         filho->numerodechaves ++;
         irmao->numerodechaves --;
     }
-    void concat(int i){
+    void concat(int i){// função responsavel para aplicar o metodo da concatenação
         int a;
         No *filho = filhos[i];
         No *irmao = filhos[i+1];
@@ -302,7 +302,7 @@ public:
         delete(irmao);
     }
 
-    void redistribuir(int i){
+    void redistribuir(int i){//função responsavel por aplicar o método da resistribuição
         if (i!=0 && filhos[i-1]->numerodechaves>=minimo){
             EsquerdaDireita(i);
         }
@@ -346,7 +346,7 @@ public:
             return raiz->busca(k);
         }
     }
-    void inserir(Key k) {
+    void inserir(Key k) {//função responsável por imserir uma key na raiz
         if (raiz == NULL){
             raiz = new No(minimo, true);
             raiz->chaves[0] = k;
@@ -369,7 +369,7 @@ public:
             }
         }
     }
-    void Gravar(fstream& arq){
+    void Gravar(fstream& arq){//função responsável por gravar a raiz em um arquivo
             arq.open("indicelista.bt",ios::binary |ios::out);
             if(!arq.is_open()){
                 arq.open("indicelista.bt",ios::binary| ios::out|ios::trunc);
@@ -379,12 +379,12 @@ public:
             raiz->Gravar(arq);
             arq.close();
     }
-    void Carregar(fstream &arq){
+    void Carregar(fstream &arq){função responsável por carregar a raiz de um arquivo
         raiz = new No(minimo, true);
         raiz->Carregar(arq);
     }
-    void remover(Key k){
-        if (!raiz){
+    void remover(Key k){//função responsável por remover a raiz
+        if (!raiz){//caso a raiz não exista
             cout << "Arvore vazia\n";
             return;
         }
@@ -399,7 +399,7 @@ public:
             delete temp;
         }
     }
-    void Escolher_Busca(string &nome){
+    void Escolher_Busca(string &nome){//função responsável por efetuar a busca
         int sel;
         fstream DB;
         string linha;
@@ -412,14 +412,14 @@ public:
             cout <<"Qual chave deseja pesquisar?\n";
             getline(cin,k.chave);
             temp = busca(k);
-            if (temp ==NULL){
+            if (temp ==NULL){//caso a key não seja encontrada
                 cout << "erro, chave nao encontrada, deseja procurar outra?\n1)Sim\n2)Nao\n";
                 getline(cin,linha);
                 sel = atoi(linha.c_str());
                 if(sel==2){
                     loop=false;
                 }
-            }else{
+            }else{//caso a key seja encontrada
                 pos = temp->PosicaoRegistro(temp->acharChave(k));
                 DB.open(nome.c_str());
                 if(DB.is_open()){
@@ -440,7 +440,7 @@ public:
             }
         }
     }
-    void Excluir_Registro(string &nome, string &nomeindice){
+    void Excluir_Registro(string &nome, string &nomeindice){//função responsável por excluir um registro do arquivo
         int sel;
         fstream DB;
         string linha;
@@ -485,7 +485,7 @@ public:
             }
         }
     }
-    void Inserir_Registro(string &nome, string &nomeindice){
+    void Inserir_Registro(string &nome, string &nomeindice){//função responsável por inserir um registro do arquivo
         int sel;
         fstream DB;
         string linha,str;
@@ -529,7 +529,7 @@ public:
             }
         }
     }
-    void Alterar_Registro(string &nome, string &nomeindice){
+    void Alterar_Registro(string &nome, string &nomeindice){//função responsável por alterar um registro do arquivo
         int sel, i, a, b;
         fstream DB;
         string linha,str, novo;
