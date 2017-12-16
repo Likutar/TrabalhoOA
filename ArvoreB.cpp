@@ -379,7 +379,7 @@ public:
             raiz->Gravar(arq);
             arq.close();
     }
-    void Carregar(fstream &arq){função responsável por carregar a raiz de um arquivo
+    void Carregar(fstream &arq){//função responsável por carregar a raiz de um arquivo
         raiz = new No(minimo, true);
         raiz->Carregar(arq);
     }
