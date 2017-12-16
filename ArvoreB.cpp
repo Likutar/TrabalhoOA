@@ -537,87 +537,76 @@ public:
         No *temp;
         Key k;
         long pos;
-        bool loop= true;
-        bool loop2 = true;
-        while(loop){
-            cout <<"\033[2J\033[1;1H";
-            cout <<"Forneça a chave primaria:\n";
-            getline(cin,k.chave);
-            temp = busca(k);
-            if(temp !=NULL){
-                DB.open(nome.c_str());
-                if(DB.is_open()){
-                    pos = temp->PosicaoRegistro(temp->acharChave(k));
-                    DB.close();
-                    while(loop2){
-                        DB.open(nome.c_str());
-                        DB.seekg(pos);
-                        getline(DB,str);
-                        cout << str << '\n';
-                        cout << "qual camp deseja editar?[1-18]\n";
-                        getline(cin,linha);
-                        sel = atoi(linha.c_str());
-                        i=0;
-                        a=0;
-                        b=0;
-                        while(i<sel-1){
-                            a++;
-                            if(str[a]==','){
-                                i++;
-                            }
-                        }
-                        a++;
-                        b=a;
-                        while(i!=sel){
-                            b++;
-                            if(str[b]==','){
-                                i++;
-                            }
-                            
-                        }
-                        linha = '\n';
-                        linha += str.substr(0,a);
-                        cout << "qual o novo valor?\n";
-                        getline(cin,novo);
-                        linha += novo;
-                        linha+= str.substr(b,string::npos);
-                        str.replace(0,string::npos,str.length(),' ');
-                        DB.seekp(pos);
-                        DB << str;
-                        DB.seekp(0,ios::end);
-                        pos = DB.tellp();
-                        DB << linha;
-                        DB.clear();
-                        pos++;
-                        // cout << "pos ="<< pos<<"\nlinha ="<< linha;
-                        if(sel==1){
-                            remover(k);
-                            k.chave = novo;
-                            k.posicao = pos;
-                            inserir(k);
-                        }else{
-                            temp->chaves[temp->acharChave(k)].posicao = pos;
-                        }
-                        cout << "deseja alterar outro campo?\n1)Sim\n2)Nao\n";
-                        getline(cin,novo);
-                        sel = atoi(novo.c_str());
-                        if(sel==2){
-                            loop =false;
-                            loop2=false;
-                        }else{
-                            str.swap(linha);
-                        }
-                        DB.clear();
-                        DB.close();
+        cout <<"\033[2J\033[1;1H";
+        cout <<"Forneça a chave primaria:\n";
+        getline(cin,k.chave);
+        temp = busca(k);
+        if(temp !=NULL){
+            DB.open(nome.c_str());
+            if(DB.is_open()){
+                pos = temp->PosicaoRegistro(temp->acharChave(k));
+                DB.seekg(pos);
+                getline(DB,str);
+                cout << str << '\n';
+                cout << "qual camp deseja editar?[1-18]\n";
+                getline(cin,linha);
+                sel = atoi(linha.c_str());
+                i=0;
+                a=0;
+                b=0;
+                while(i<sel-1){
+                    a++;
+                    if(str[a]==','){
+                        i++;
                     }
-                }else{
-                    cout << "erro, arquivo nao encontrado ";
-                    loop=false;
                 }
+                a++;
+                b=a;
+                while(i!=sel){
+                    b++;
+                    if(str[b]==','){
+                        i++;
+                    }
+                    
+                }
+                linha = '\n';
+                if(sel ==1){
+                    cout << "qual o novo valor?\n";
+                    getline(cin,novo);
+                    linha += novo;
+                    linha+= str.substr(b,string::npos);
+                }else{
+                    linha += str.substr(0,a);
+                    cout << "qual o novo valor?\n";
+                    getline(cin,novo);
+                    linha += novo;
+                    linha+= str.substr(b,string::npos);
+                }
+                str.replace(0,string::npos,str.length(),' ');
+                DB.seekp(pos);
+                DB << str;
+                DB.seekp(0,ios::end);
+                pos = DB.tellp();
+                DB << linha;
+                DB.clear();
+                pos++;
+                // cout << "pos ="<< pos<<"\nlinha ="<< linha;
+                if(sel==1){
+                    remover(k);
+                    k.chave = novo;
+                    k.posicao = pos;
+                    inserir(k);
+                }else{
+                    temp->chaves[temp->acharChave(k)].posicao = pos;
+                }
+                DB.clear();
                 DB.close();
             }else{
-                cout << "essa chave primaria nao existe\n";
+                cout << "erro, arquivo nao encontrado ";
             }
+            DB.close();
+        }else{
+            cout << "essa chave primaria nao existe\n";
         }
     }
 };
