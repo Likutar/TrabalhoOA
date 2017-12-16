@@ -100,7 +100,6 @@ int main(){
         nome = "data.txt";
         nomeindice ="indicelista.bt";
         raiz = Carregar(nomeindice);
-        cout << "ok\n";
         if (raiz == NULL){
             DB.open("data.txt");
             raiz = parse(DB);
@@ -115,22 +114,25 @@ int main(){
         switch(sel){
             case 1:
                 raiz->Escolher_Busca(nome);
+                raiz->Gravar(arq);
                 break;
             case 2:
                 raiz->Inserir_Registro(nome, nomeindice);
+                raiz->Gravar(arq);
                 break;
             case 3:
                 raiz->Excluir_Registro(nome, nomeindice);
+                raiz->Gravar(arq);
                 break;
             case 4:
                 raiz->Alterar_Registro(nome, nomeindice);
+                raiz->Gravar(arq);
                 break;
             default:
                 loop = 0;
+                raiz->Gravar(arq);
         }
     }
-    cout << "arvore pronta\n";
-    raiz->Gravar(arq);
     delete raiz;
     return 0;
 }

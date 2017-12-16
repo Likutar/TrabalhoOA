@@ -110,7 +110,6 @@ public:
         while (i < numerodechaves && k.chave >chaves[i].chave){
             i++;
         }
-        cout << "chave["<< i<<"]= "<<chaves[i].chave<<"k="<<k.chave<<'\n';
         if (chaves[i].chave.compare(k.chave)==0){
             return this;
         }
@@ -590,7 +589,6 @@ public:
                 DB << linha;
                 DB.clear();
                 pos++;
-                // cout << "pos ="<< pos<<"\nlinha ="<< linha;
                 if(sel==1){
                     remover(k);
                     k.chave = novo;
