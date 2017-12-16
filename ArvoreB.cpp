@@ -2,7 +2,7 @@
 #include <cstdlib>
 #include <fstream>
 using namespace std;
-struct Key{
+struct Key{// estrutura feita para guardar a chave e a posição no registro
     string chave;
     long posicao;
     Key(){
@@ -10,7 +10,7 @@ struct Key{
         chave = " ";
     }
 };
-class No{
+class No{//clasee utilizada como nó da árvore
     Key *chaves; 
     int minimo;  
     No **filhos; 
@@ -24,9 +24,9 @@ public:
         filhos = new No *[2*minimo];
         numerodechaves = 0;
     }
-    void InserirNaoCheio(Key k){
+    void InserirNaoCheio(Key k){//insere um Key caso o arquivo não esteja cheio
         int i = numerodechaves-1;
-        if (folha == true){
+        if (folha == true){//caso nó o onde a key vai ser inserida seja uma folha 
             while (i >= 0 && chaves[i].chave > k.chave){
                 chaves[i+1] = chaves[i];
                 i--;
